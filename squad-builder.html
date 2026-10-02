@@ -1,0 +1,3114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Complete squad builder, roster manager, rules reference codex, and searchable equipment/power knowledge base for Stargrave tabletop miniatures game.">
+<meta name="theme-color" content="#070b16">
+<meta property="og:title" content="Stargrave — Ultimate Crew Builder &amp; Knowledge Base">
+<meta property="og:description" content="Build, validate, manage, and print your Stargrave crew. Includes all expansions (Core, Quarantine 37, The Last Prospector, Bea Bounty Hunter, Hope Eternal, Death Vector), house rules, and full codex.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛸</text></svg>">
+<title>Stargrave — Ultimate Crew Builder &amp; Knowledge Base</title>
+<style>
+  :root{
+    --bg:#070b16; --bg-card:#0e1526; --bg-card2:#131d33; --ink:#e8ecf7;
+    --muted:#8b97b5; --muted-dark:#4d5b7a; --line:#24324f; --line-bright:#3b4f7a;
+    --accent:#49d6ff; --accent-glow:rgba(73,214,255,0.25);
+    --accent2:#ff5fae; --accent2-glow:rgba(255,95,174,0.25);
+    --gold:#ffcf5c; --gold-glow:rgba(255,207,92,0.25);
+    --good:#5fe0a0; --good-bg:rgba(95,224,160,0.12);
+    --warn:#ff8f6b; --warn-bg:rgba(255,143,107,0.12);
+    --bad:#ff5f6b; --bad-bg:rgba(255,95,107,0.15);
+    --purple:#b388ff;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:"Segoe UI",system-ui,-apple-system,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #16213f 0%, transparent 60%),
+      radial-gradient(900px 500px at 0% 10%, #201433 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding-bottom:120px;
+  }
+  header{padding:26px clamp(14px, 2vw, 40px) 16px; text-align:center; position:relative; overflow:hidden; border-bottom:1px solid var(--line)}
+  header::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%,#fff 50%,transparent),
+      radial-gradient(1px 1px at 70% 20%,#cfe 50%,transparent),
+      radial-gradient(1.5px 1.5px at 40% 70%,#fff 50%,transparent),
+      radial-gradient(1px 1px at 85% 60%,#9df 50%,transparent),
+      radial-gradient(1.5px 1.5px at 55% 40%,#fff 50%,transparent);
+    opacity:.45; animation:drift 70s linear infinite; pointer-events:none;
+  }
+  @keyframes drift{to{transform:translateY(-30px)}}
+  .brand-title{
+    margin:0; font-size:clamp(24px,4.5vw,38px); letter-spacing:3.5px; text-transform:uppercase; font-weight:800;
+    background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; background-clip:text;
+    color:transparent; text-shadow:0 0 35px rgba(73,214,255,.25);
+  }
+  .brand-sub{margin-top:4px; font-size:12.5px; color:var(--muted); letter-spacing:1px}
+
+  .wrap{
+    width:100%;
+    max-width:clamp(1200px, 98vw, 3600px);
+    margin:0 auto;
+    padding:18px clamp(12px, 2vw, 40px);
+  }
+
+  /* Navigation & Toolbar */
+  .top-bar{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:14px}
+  .tabs{display:flex; gap:8px; flex-wrap:wrap}
+  .tab{
+    border:1px solid var(--line); background:var(--bg-card); color:var(--muted); padding:9px 18px;
+    border-radius:999px; cursor:pointer; font-size:13px; letter-spacing:.5px; font-weight:700; transition:.15s;
+    display:flex; align-items:center; gap:6px;
+  }
+  .tab:hover{color:var(--ink); border-color:var(--accent)}
+  .tab.active{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#06121f; border-color:transparent; box-shadow:0 0 14px rgba(73,214,255,0.3)}
+
+  .quick-actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+  .btn{
+    border:1px solid var(--line); background:#0c1424; color:var(--ink); padding:7px 13px;
+    border-radius:8px; cursor:pointer; font-size:12px; font-weight:600; transition:.15s;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .btn:hover{border-color:var(--accent); color:var(--accent)}
+  .btn-gold{background:rgba(255,207,92,0.12); color:var(--gold); border-color:rgba(255,207,92,0.35)}
+  .btn-gold:hover{background:rgba(255,207,92,0.22); color:#fff; border-color:var(--gold)}
+  .btn-cyan{background:rgba(73,214,255,0.12); color:var(--accent); border-color:rgba(73,214,255,0.35)}
+  .btn-cyan:hover{background:rgba(73,214,255,0.22); color:#fff; border-color:var(--accent)}
+  .btn-bad{background:var(--bad-bg); color:var(--bad); border-color:rgba(255,95,107,0.35)}
+  .btn-bad:hover{background:rgba(255,95,107,0.28); color:#fff}
+
+  .save-status{font-size:11px; color:var(--muted); display:inline-flex; align-items:center; gap:5px}
+  .save-dot{width:7px; height:7px; border-radius:50%; background:var(--good); box-shadow:0 0 8px var(--good)}
+
+  .view{display:none} .view.active{display:block}
+
+  /* Crew Info Header Card */
+  .meta-card{
+    background:linear-gradient(180deg,var(--bg-card2),var(--bg-card)); border:1px solid var(--line);
+    border-radius:14px; padding:16px 20px; margin-top:14px; display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; align-items:center;
+  }
+  .meta-field label{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); display:block; margin-bottom:4px; font-weight:700}
+  .meta-field input{
+    width:100%; background:#09101f; border:1px solid var(--line); border-radius:8px;
+    padding:8px 12px; color:var(--ink); font-size:13.5px; outline:none; transition:.15s;
+  }
+  .meta-field input:focus{border-color:var(--accent); box-shadow:0 0 10px rgba(73,214,255,0.2)}
+
+  /* House Rules Card */
+  .rules-card{
+    background:linear-gradient(180deg,var(--bg-card2),var(--bg-card)); border:1px solid var(--line);
+    border-radius:14px; margin-top:14px; overflow:hidden; transition:border-color .2s;
+  }
+  .rules-card:hover{border-color:var(--line-bright)}
+  .rules-hd{
+    padding:12px 18px; display:flex; justify-content:space-between; align-items:center;
+    cursor:pointer; user-select:none; background:rgba(255,255,255,0.015);
+  }
+  .rules-hd:hover{background:rgba(255,255,255,0.035)}
+  .rules-chevron{font-size:13px; transition:transform .2s; color:var(--muted)}
+  .rules-chevron.collapsed{transform:rotate(-90deg)}
+  .rules-body{
+    padding:12px 18px 16px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:10px;
+  }
+  .rules-body.collapsed{display:none}
+  .rule-item{
+    display:flex; align-items:center; gap:14px; padding:10px 14px; border-radius:10px;
+    background:#080e1a; border:1px solid var(--line); transition:border-color .15s;
+  }
+  .rule-item:hover{border-color:var(--line-bright)}
+  .rule-info{flex:1}
+  .rule-name{font-size:13px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:8px}
+  .rule-desc{font-size:11.5px; color:var(--muted); margin-top:3px; line-height:1.4}
+
+  /* Toggle Switch */
+  .switch{position:relative; display:inline-block; width:40px; height:22px; flex-shrink:0}
+  .switch input{opacity:0; width:0; height:0}
+  .slider{
+    position:absolute; cursor:pointer; inset:0; background:#1b263b; transition:.2s; border-radius:34px; border:1px solid var(--line);
+  }
+  .slider:before{
+    position:absolute; content:""; height:16px; width:16px; left:2px; bottom:2px; background:#8b97b5; transition:.2s; border-radius:50%;
+  }
+  .switch input:checked + .slider{background:linear-gradient(90deg,var(--accent),var(--accent2)); border-color:transparent}
+  .switch input:checked + .slider:before{transform:translateX(18px); background:#06121f}
+
+  /* Section Containers */
+  .section{
+    background:linear-gradient(180deg,var(--bg-card2),var(--bg-card)); border:1px solid var(--line);
+    border-radius:16px; padding:20px 22px; margin-top:18px; position:relative;
+  }
+  .section-hd{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px}
+  .section h3{margin:0; font-size:17px; letter-spacing:.8px; display:flex; align-items:center; gap:10px; font-weight:700}
+  .pills{display:flex; gap:8px; flex-wrap:wrap}
+  .pill{
+    font-size:11px; background:#080e1a; border:1px solid var(--line); color:var(--muted);
+    padding:3px 10px; border-radius:999px; font-weight:700; letter-spacing:.5px; display:inline-flex; align-items:center; gap:5px;
+  }
+  .pill.ok{color:var(--good); border-color:rgba(95,224,160,0.35); background:rgba(95,224,160,0.08)}
+  .pill.warn{color:var(--warn); border-color:rgba(255,143,107,0.35); background:rgba(255,143,107,0.08)}
+  .pill.bad{color:var(--bad); border-color:rgba(255,95,107,0.35); background:rgba(255,95,107,0.1)}
+  .note{font-size:12px; color:var(--muted); margin-top:6px}
+
+  /* Captain & First Mate Pickers */
+  .picker{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:12px}
+  .slot{
+    background:#080e1a; border:1px solid var(--line); border-radius:14px; padding:16px 18px;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .slot-title{
+    display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:8px;
+  }
+  .slot-title h4{margin:0; font-size:14px; letter-spacing:1px; text-transform:uppercase; color:var(--gold)}
+  .slot-title .role-badge{font-size:10px; background:rgba(255,207,92,0.15); color:var(--gold); border:1px solid rgba(255,207,92,0.4); padding:2px 7px; border-radius:6px; font-weight:700}
+
+  select{
+    width:100%; background:#0e172a; color:var(--ink); border:1px solid var(--line);
+    border-radius:9px; padding:9px 12px; font-size:13.5px; outline:none; transition:.15s;
+  }
+  select:focus{border-color:var(--accent)}
+
+  /* Interactive Leader Stat Blocks */
+  .stat-card{
+    background:#0d1629; border:1px solid var(--line-bright); border-radius:10px; padding:10px 14px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .stat-grid{
+    display:grid; grid-template-columns:repeat(6,1fr); gap:6px; text-align:center;
+  }
+  .stat-box{background:#070d18; border:1px solid var(--line); border-radius:7px; padding:5px 2px}
+  .stat-box .lbl{font-size:10px; color:var(--muted); font-weight:700; text-transform:uppercase}
+  .stat-box .val{font-size:15px; font-weight:800; color:var(--good); margin-top:1px}
+  .stat-box .val.modified{color:var(--accent); text-shadow:0 0 8px rgba(73,214,255,0.4)}
+
+  /* Stat Choice Toggles */
+  .stat-choices{background:#091122; border:1px solid rgba(73,214,255,0.2); border-radius:9px; padding:10px 12px}
+  .stat-choices-lbl{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--accent); font-weight:700; margin-bottom:6px}
+  .choice-btns{display:flex; flex-wrap:wrap; gap:6px}
+  .choice-btn{
+    font-size:11.5px; background:#0e192f; border:1px solid var(--line); color:var(--muted);
+    padding:4px 9px; border-radius:6px; cursor:pointer; font-weight:600; transition:.12s; user-select:none;
+  }
+  .choice-btn:hover{border-color:var(--accent); color:var(--ink)}
+  .choice-btn.sel{background:rgba(73,214,255,0.22); color:#fff; border-color:var(--accent); font-weight:700}
+
+  /* Powers List */
+  .pwpick{margin-top:4px}
+  .pwpick .hd{
+    font-size:11.5px; letter-spacing:1px; text-transform:uppercase; color:var(--muted);
+    margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .pwpick .hd .cnt{font-weight:700}
+  .pwpick .hd .cnt.full{color:var(--good)} .pwpick .hd .cnt.over{color:var(--bad)}
+  .pwlist{display:flex; flex-wrap:wrap; gap:7px}
+  .pwopt{
+    font-size:12px; background:#0e192f; border:1px solid var(--line); color:#c0cbdf;
+    padding:5px 10px; border-radius:8px; cursor:pointer; user-select:none; transition:.12s;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .pwopt:hover{border-color:var(--accent); color:#fff}
+  .pwopt.sel{background:linear-gradient(90deg,rgba(73,214,255,.25),rgba(255,95,174,.25)); color:#fff; border-color:var(--accent); font-weight:700; box-shadow:0 0 10px rgba(73,214,255,0.15)}
+  .pwopt.disabled{opacity:.35; cursor:not-allowed}
+  .pwopt .tn{font-size:10px; font-weight:800; padding:1px 5px; border-radius:4px; background:#060b14; color:var(--gold)}
+  .pwopt .info-icon{font-size:11px; opacity:.6}
+  .pwopt .info-icon:hover{opacity:1; color:var(--accent)}
+
+  /* Power Timing Markers */
+  .timing-chip{
+    font-size:9.5px; font-weight:800; letter-spacing:0.4px; text-transform:uppercase;
+    padding:1px 6px; border-radius:4px; display:inline-flex; align-items:center; gap:3px;
+    line-height:1.25; white-space:nowrap;
+  }
+  .timing-chip.timing-before{
+    background:rgba(255,207,92,0.14); color:var(--gold); border:1px solid rgba(255,207,92,0.45);
+  }
+  .timing-chip.timing-during{
+    background:rgba(73,214,255,0.12); color:var(--accent); border:1px solid rgba(73,214,255,0.35);
+  }
+  .timing-chip.timing-after{
+    background:rgba(179,136,255,0.14); color:var(--purple); border:1px solid rgba(179,136,255,0.45);
+  }
+
+  .special-box{
+    font-size:12px; background:rgba(255,143,107,.08); border:1px solid rgba(255,143,107,.3);
+    border-radius:9px; padding:9px 12px; margin-top:8px;
+  }
+  .special-box .lbl{color:var(--warn); font-size:10px; text-transform:uppercase; letter-spacing:1px; font-weight:700}
+  .special-box ul{margin:5px 0 0; padding-left:16px} .special-box li{margin:2px 0}
+
+  /* Recruited Roster */
+  .roster{
+    margin-top:14px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(clamp(320px, 45vw, 560px), 1fr));
+    gap:10px;
+  }
+  .ritem{
+    background:#080e1a; border:1px solid var(--line); border-radius:11px; padding:10px 14px;
+    display:grid; grid-template-columns:auto 1fr auto auto; gap:12px; align-items:center; transition:.15s;
+    min-width:0;
+  }
+  .ritem:hover{border-color:var(--line-bright); background:#0a1222}
+  .ritem .num{font-size:12px; color:var(--muted); font-weight:800; min-width:22px}
+  .ritem .info{display:flex; flex-direction:column; gap:3px; min-width:0}
+  .ritem .name-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .ritem .custom-name{
+    background:transparent; border:none; border-bottom:1px dashed var(--line-bright);
+    color:var(--ink); font-weight:700; font-size:14px; padding:1px 4px; outline:none; max-width:240px;
+  }
+  .ritem .custom-name:focus{border-bottom-color:var(--accent); background:#060c18}
+  .ritem .type-tag{
+    font-size:10px; letter-spacing:.8px; text-transform:uppercase; padding:2px 7px;
+    border-radius:5px; font-weight:800;
+  }
+  .type-tag.standard{background:rgba(73,214,255,0.12); color:var(--accent); border:1px solid rgba(73,214,255,0.3)}
+  .type-tag.specialist{background:rgba(255,95,174,0.12); color:var(--accent2); border:1px solid rgba(255,95,174,0.3)}
+  .ritem .stats-mini{
+    font-size:11.5px; font-family:monospace; color:var(--good); display:flex; gap:10px; margin-top:2px; flex-wrap:wrap;
+  }
+  .ritem .stats-mini span{color:var(--muted)}
+  .ritem .gear-notes{font-size:11px; color:var(--muted); margin-top:2px}
+  .ritem .cost-box{font-size:13px; font-weight:700; text-align:right}
+  .ritem .cost-box .cost{color:var(--gold)}
+  .ritem .cost-box .free{color:var(--good)}
+  .ritem .actions{display:flex; gap:6px}
+  .icon-btn{
+    background:#0c1527; border:1px solid var(--line); color:var(--muted); width:28px; height:28px;
+    border-radius:7px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
+    font-size:12px; transition:.12s;
+  }
+  .icon-btn:hover{color:var(--ink); border-color:var(--accent)}
+  .icon-btn.rm:hover{color:var(--bad); border-color:var(--bad); background:var(--bad-bg)}
+  .empty{grid-column:1 / -1; color:var(--muted); font-style:italic; font-size:13px; padding:14px; text-align:center; border:1px dashed var(--line); border-radius:10px}
+
+  /* Recruitment Pool Controls & Table */
+  .pool-controls{
+    display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap;
+  }
+  .filter-group{display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+  .filter-btn{
+    background:#080e1a; border:1px solid var(--line); color:var(--muted); padding:5px 11px;
+    border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; transition:.12s;
+  }
+  .filter-btn:hover{color:var(--ink); border-color:var(--accent)}
+  .filter-btn.active{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#06121f; border-color:transparent; font-weight:700}
+  .search-input{
+    background:#080e1a; border:1px solid var(--line); color:var(--ink); padding:6px 12px;
+    border-radius:999px; font-size:12.5px; outline:none; min-width:200px;
+  }
+  .search-input:focus{border-color:var(--accent)}
+
+  .table-wrap{overflow-x:auto; margin-top:10px; border:1px solid var(--line); border-radius:12px; background:#080e1a}
+  table{width:100%; border-collapse:collapse; font-size:12.5px}
+  th,td{text-align:left; padding:8px 11px; border-bottom:1px solid var(--line)}
+  th{color:var(--muted); font-size:10.5px; letter-spacing:1px; text-transform:uppercase; font-weight:700; background:#060b15}
+  tr:hover td{background:rgba(73,214,255,.03)}
+  .srcbook{font-size:10px; color:var(--muted); background:#060c16; border:1px solid var(--line); padding:1px 6px; border-radius:5px}
+
+  .add-btn{
+    background:var(--good-bg); color:var(--good); border:1px solid rgba(95,224,160,.4);
+    border-radius:7px; padding:4px 10px; cursor:pointer; font-size:11.5px; font-weight:700; transition:.15s; white-space:nowrap;
+  }
+  .add-btn:hover{background:rgba(95,224,160,.25); color:#fff}
+  .add-btn:disabled{opacity:.25; cursor:not-allowed; background:transparent; border-color:var(--line); color:var(--muted)}
+
+  /* Gear & Ship Upgrades */
+  .gear-sections{display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:16px; margin-top:12px}
+  .gear-col{background:#080e1a; border:1px solid var(--line); border-radius:12px; padding:12px 14px}
+  .gear-col-title{font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--accent); font-weight:800; margin-bottom:10px; display:flex; justify-content:space-between}
+  .gearrow{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 0; border-bottom:1px solid rgba(36,50,79,0.5);
+  }
+  .gearrow:last-child{border-bottom:none}
+  .gearrow .ginfo b{font-size:13px}
+  .gearrow .gcost{font-size:11.5px; color:var(--gold); font-weight:700; margin-left:4px}
+  .gearrow .gfree{font-size:11px; color:var(--good); font-weight:700; margin-left:4px}
+  .gearrow .gnote{font-size:11px; color:var(--muted); margin-top:1px}
+  .stepper{display:flex; align-items:center; gap:6px}
+  .stepper button{
+    width:24px; height:24px; border-radius:6px; border:1px solid var(--line); background:#0e172a;
+    color:var(--ink); cursor:pointer; font-size:15px; line-height:1; display:flex; align-items:center; justify-content:center;
+  }
+  .stepper button:hover{border-color:var(--accent); color:var(--accent)}
+  .stepper .q{min-width:20px; text-align:center; font-weight:800; font-size:13px}
+
+  /* Aristocrat Free Ship Perk Banner */
+  .aristo-banner{
+    background:linear-gradient(90deg,rgba(255,207,92,0.12),rgba(73,214,255,0.08));
+    border:1px solid rgba(255,207,92,0.4); border-radius:10px; padding:10px 14px;
+    margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;
+  }
+  .aristo-banner-text{font-size:12.5px; color:var(--ink)}
+  .aristo-banner-text b{color:var(--gold)}
+  .aristo-select{max-width:260px; font-size:12px; padding:5px 8px}
+
+  /* Sticky Budget Bar */
+  .budgetbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:90;
+    background:rgba(8,13,25,.95); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-top:1px solid var(--line); padding:10px 0; box-shadow:0 -10px 30px rgba(0,0,0,0.5);
+  }
+  .bb-inner{
+    width:100%;
+    max-width:clamp(1200px, 98vw, 3600px);
+    margin:0 auto;
+    padding:0 clamp(12px, 2vw, 40px);
+    display:flex; align-items:center;
+    gap:18px; flex-wrap:wrap; justify-content:space-between;
+  }
+  .bb-stats-group{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+  .bb-stat{text-align:center}
+  .bb-stat .v{font-size:19px; font-weight:800; line-height:1.1}
+  .bb-stat .l{font-size:9.5px; letter-spacing:1px; text-transform:uppercase; color:var(--muted); margin-top:2px}
+  .bb-stat .v.ok{color:var(--good)} .bb-stat .v.over{color:var(--bad)} .bb-stat .v.gold{color:var(--gold)}
+  .meter{flex:1; min-width:180px; max-width:440px}
+  .meter .track{height:10px; background:#070d18; border:1px solid var(--line); border-radius:999px; overflow:hidden}
+  .meter .fill{height:100%; width:0%; background:linear-gradient(90deg,var(--good),var(--accent)); transition:width .25s ease}
+  .meter .fill.over{background:linear-gradient(90deg,var(--warn),var(--bad))}
+
+  .bb-warns{
+    width:100%; font-size:11.5px; font-weight:700; text-align:center; margin-top:4px;
+    display:flex; justify-content:center; gap:14px; flex-wrap:wrap; min-height:16px;
+  }
+  .warn-item{color:var(--bad); display:inline-flex; align-items:center; gap:4px}
+  .warn-item.info{color:var(--gold)}
+
+  /* Modal Power Popup / Tooltip */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:200; background:rgba(4,7,14,0.75); backdrop-filter:blur(5px);
+    display:none; align-items:center; justify-content:center; padding:16px;
+  }
+  .modal-overlay.open{display:flex}
+  .modal-card{
+    background:#0d1629; border:1px solid var(--accent); border-radius:14px; max-width:480px; width:100%;
+    padding:20px 22px; box-shadow:0 15px 50px rgba(0,0,0,0.8); position:relative;
+  }
+  .modal-card h3{margin:0; font-size:18px; color:var(--accent); display:flex; justify-content:space-between; align-items:center}
+  .modal-close{background:transparent; border:none; color:var(--muted); font-size:20px; cursor:pointer}
+  .modal-close:hover{color:#fff}
+  .modal-tags{display:flex; gap:8px; margin:10px 0; flex-wrap:wrap}
+  .modal-tag{font-size:11px; background:#060b14; border:1px solid var(--line); padding:2px 8px; border-radius:6px; font-weight:700}
+  .modal-tag.tn{color:var(--gold); border-color:rgba(255,207,92,0.4)}
+  .modal-tag.strain{color:var(--bad); border-color:rgba(255,95,107,0.4)}
+  .modal-tag.timing-before{color:var(--gold); border-color:rgba(255,207,92,0.5); background:rgba(255,207,92,0.12)}
+  .modal-tag.timing-during{color:var(--accent); border-color:rgba(73,214,255,0.45); background:rgba(73,214,255,0.1)}
+  .modal-tag.timing-after{color:var(--purple); border-color:rgba(179,136,255,0.5); background:rgba(179,136,255,0.12)}
+  .modal-desc{font-size:13.5px; color:#d8e2f8; line-height:1.55; margin-top:8px}
+
+  /* Reference Directory View */
+  .ref-subtabs{display:flex; gap:8px; justify-content:center; margin:16px 0; flex-wrap:wrap}
+  .ref-subtab{
+    background:#080e1a; border:1px solid var(--line); color:var(--muted); padding:6px 14px;
+    border-radius:999px; font-size:12.5px; font-weight:700; cursor:pointer; transition:.15s;
+  }
+  .ref-subtab:hover{color:var(--ink); border-color:var(--accent)}
+  .ref-subtab.active{background:var(--accent); color:#06121f; border-color:transparent}
+
+  .ref-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:18px; margin-top:14px}
+  .card{
+    background:linear-gradient(180deg,var(--bg-card2),var(--bg-card)); border:1px solid var(--line);
+    border-radius:14px; overflow:hidden; display:flex; flex-direction:column; transition:.18s; position:relative;
+  }
+  .card:hover{transform:translateY(-3px); border-color:var(--accent); box-shadow:0 12px 35px rgba(0,0,0,.5)}
+  .card .top{padding:16px 18px 12px; border-bottom:1px solid var(--line); position:relative}
+  .card h2{margin:0; font-size:19px; letter-spacing:.8px}
+  .src{display:inline-block; margin-top:6px; font-size:10px; letter-spacing:1px; text-transform:uppercase; padding:2px 8px; border-radius:5px; font-weight:700}
+  .src.core{background:rgba(73,214,255,.15); color:var(--accent); border:1px solid rgba(73,214,255,.4)}
+  .src.q37, .src.quad{background:rgba(255,95,174,.13); color:var(--accent2); border:1px solid rgba(255,95,174,.4)}
+  .src.tlp{background:rgba(95,224,160,.13); color:var(--good); border:1px solid rgba(95,224,160,.4)}
+  .src.be, .src.hope{background:rgba(255,207,92,.13); color:var(--gold); border:1px solid rgba(255,207,92,.4)}
+  .badge-cap{position:absolute; top:14px; right:16px; font-size:10px; letter-spacing:1px; background:rgba(255,143,107,.15); color:var(--warn); border:1px solid rgba(255,143,107,.5); padding:2px 7px; border-radius:5px; text-transform:uppercase; font-weight:700}
+  .card .body{padding:14px 18px 18px; display:flex; flex-direction:column; gap:12px; flex:1}
+  .flavor{font-size:12.5px; color:var(--muted); font-style:italic; border-left:2px solid var(--line); padding-left:10px}
+  .ref-desc-box{
+    background:#070d18; border:1px solid var(--line); border-radius:8px;
+    padding:11px 13px; font-size:12px; color:#c7d2ea; line-height:1.55;
+  }
+  .ref-desc-box .lbl{
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+    color:var(--muted); margin-bottom:5px; display:flex; align-items:center; gap:5px;
+  }
+  .ref-synergy-box{
+    background:rgba(73,214,255,0.035); border:1px solid rgba(73,214,255,0.22); border-radius:8px;
+    padding:11px 13px; display:flex; flex-direction:column; gap:7px;
+  }
+  .ref-synergy-box .lbl{
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+    color:var(--accent); display:flex; align-items:center; gap:5px; margin-bottom:2px;
+  }
+  .syn-item{font-size:11.5px; line-height:1.45; color:var(--ink)}
+  .syn-item b{color:var(--accent)}
+  .syn-item b.gold{color:var(--gold)}
+  .syn-item b.green{color:var(--good)}
+  .bg-synergy-drawer summary::-webkit-details-marker{display:none}
+
+  /* ===================== KNOWLEDGE BASE (KB) STYLES ===================== */
+  .kb-section{
+    background:linear-gradient(180deg,var(--bg-card2),var(--bg-card)); border:1px solid var(--line);
+    border-radius:16px; padding:22px 24px; margin-top:16px;
+  }
+  .kb-header-row{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:14px;
+  }
+  .kb-title-block h2{margin:0; font-size:20px; color:var(--accent); letter-spacing:1px; display:flex; align-items:center; gap:8px}
+  .kb-title-block .kb-sub{font-size:12px; color:var(--muted); margin-top:3px}
+
+  .kb-search-bar{
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center; width:100%; margin-bottom:12px;
+  }
+  .kb-search-bar input{
+    flex:1; min-width:260px; background:#080e1a; border:1px solid var(--line); color:var(--ink);
+    padding:9px 16px; border-radius:999px; font-size:13.5px; outline:none; transition:.15s;
+  }
+  .kb-search-bar input:focus{border-color:var(--accent); box-shadow:0 0 12px rgba(73,214,255,0.25)}
+
+  .kb-filters{display:flex; flex-direction:column; gap:10px; margin-bottom:16px}
+  .kb-filter-row{display:flex; gap:6px; flex-wrap:wrap; align-items:center}
+  .kb-filter-lbl{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:700; min-width:85px}
+
+  .kb-pill{
+    background:#080e1a; border:1px solid var(--line); color:var(--muted); padding:5px 12px;
+    border-radius:999px; font-size:12px; font-weight:600; cursor:pointer; transition:.12s; user-select:none;
+  }
+  .kb-pill:hover{color:var(--ink); border-color:var(--accent)}
+  .kb-pill.active{background:linear-gradient(90deg,var(--accent),var(--accent2)); color:#06121f; border-color:transparent; font-weight:800}
+
+  .kb-view-toggle{display:flex; gap:6px; background:#080e1a; border:1px solid var(--line); border-radius:8px; padding:3px}
+  .kb-view-btn{background:transparent; border:none; color:var(--muted); padding:4px 10px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer}
+  .kb-view-btn.active{background:#0e172a; color:var(--accent)}
+
+  /* KB Cards Grid */
+  .kb-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:16px; margin-top:14px}
+  .kb-card{
+    background:#080e1a; border:1px solid var(--line); border-radius:13px; padding:15px 18px;
+    display:flex; flex-direction:column; gap:10px; transition:.18s; position:relative;
+  }
+  .kb-card:hover{border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+  .kb-card-hd{display:flex; justify-content:space-between; align-items:flex-start; gap:8px}
+  .kb-card-hd h4{margin:0; font-size:16px; letter-spacing:.5px; color:#fff}
+
+  .kb-badges{display:flex; gap:6px; flex-wrap:wrap; margin-top:2px}
+  .kb-badge{
+    font-size:10px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; padding:2px 7px;
+    border-radius:5px; border:1px solid var(--line); background:#060b14; color:var(--muted);
+  }
+  .kb-badge.tn{color:var(--gold); border-color:rgba(255,207,92,0.4); background:rgba(255,207,92,0.08)}
+  .kb-badge.strain{color:var(--bad); border-color:rgba(255,95,107,0.4); background:rgba(255,95,107,0.08)}
+  .kb-badge.cat{color:var(--accent); border-color:rgba(73,214,255,0.4); background:rgba(73,214,255,0.08)}
+  .kb-badge.loot{color:var(--purple); border-color:rgba(179,136,255,0.4); background:rgba(179,136,255,0.08)}
+  .kb-badge.artifact{color:var(--accent2); border-color:rgba(255,95,174,0.4); background:rgba(255,95,174,0.08)}
+  .kb-badge.timing-before{color:var(--gold); border-color:rgba(255,207,92,0.5); background:rgba(255,207,92,0.12)}
+  .kb-badge.timing-during{color:var(--accent); border-color:rgba(73,214,255,0.45); background:rgba(73,214,255,0.1)}
+  .kb-badge.timing-after{color:var(--purple); border-color:rgba(179,136,255,0.5); background:rgba(179,136,255,0.12)}
+
+  .kb-specs-row{
+    display:flex; gap:12px; font-size:11.5px; color:var(--good); font-family:monospace; background:#050a14;
+    padding:6px 10px; border-radius:7px; border:1px solid rgba(36,50,79,0.5); flex-wrap:wrap;
+  }
+  .kb-specs-row span{color:var(--muted); font-family:sans-serif}
+
+  .kb-desc{font-size:12.5px; color:#c7d3ea; line-height:1.55}
+
+  .kb-meta-footer{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+    margin-top:auto; padding-top:8px; border-top:1px solid rgba(36,50,79,0.5); font-size:11px; color:var(--muted);
+  }
+  .kb-bg-tags{display:flex; gap:4px; flex-wrap:wrap}
+  .kb-bg-tag{
+    font-size:10px; background:#0d1629; border:1px solid var(--line); color:var(--accent);
+    padding:1px 6px; border-radius:4px; cursor:pointer;
+  }
+  .kb-bg-tag:hover{border-color:var(--accent); color:#fff}
+
+  .kb-card-actions{display:flex; gap:6px; margin-top:4px}
+  .kb-action-btn{
+    flex:1; background:#0e172a; border:1px solid var(--line); color:var(--ink); padding:5px 8px;
+    border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; transition:.12s; text-align:center;
+  }
+  .kb-action-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .kb-action-btn.active{background:rgba(95,224,160,0.18); border-color:var(--good); color:var(--good)}
+
+  /* Toast Notification */
+  .toast{
+    position:fixed; top:20px; right:20px; z-index:300; background:#0d182e; color:var(--good);
+    border:1px solid var(--good); border-radius:8px; padding:10px 18px; font-size:13px; font-weight:700;
+    box-shadow:0 8px 30px rgba(0,0,0,0.6); transform:translateY(-40px); opacity:0; pointer-events:none; transition:.25s ease;
+  }
+  .toast.show{transform:translateY(0); opacity:1}
+
+  /* ===================== RESPONSIVE & DEVICE SCALING ===================== */
+  /* Ultrawide Displays (1440p+, 4K, 21:9 & 32:9 Super Ultrawide) */
+  @media(min-width: 2200px){
+    .wrap{padding:22px clamp(20px, 2.5vw, 56px)}
+    .section{padding:24px 28px}
+    .gear-sections{grid-template-columns:repeat(4, 1fr)}
+  }
+
+  /* Compact Laptops & Tablets */
+  @media(max-width: 1024px){
+    .picker{grid-template-columns:1fr}
+  }
+
+  /* Tablets & Mobile */
+  @media(max-width: 768px){
+    .top-bar{flex-direction:column; align-items:stretch; gap:10px}
+    .tabs{justify-content:center}
+    .quick-actions{justify-content:center}
+    .tab{padding:8px 14px; font-size:12px; flex:1 1 auto; text-align:center; justify-content:center}
+    .pool-controls{flex-direction:column; align-items:stretch}
+    .search-input{min-width:100%}
+    .gear-sections{grid-template-columns:1fr}
+    .ref-grid, .kb-grid{grid-template-columns:1fr}
+  }
+
+  /* Small Mobile Phones */
+  @media(max-width: 600px){
+    body{padding-bottom:170px}
+    .brand-title{font-size:22px; letter-spacing:2px}
+    .bb-inner{gap:8px; justify-content:center}
+    .meter{order:3; width:100%; min-width:100%; max-width:100%}
+    .bb-stats-group{justify-content:space-around; width:100%}
+    .bb-stat .v{font-size:15px}
+    .bb-stat .l{font-size:9px}
+    .ritem{grid-template-columns:auto 1fr; gap:8px}
+    .ritem .cost-box{grid-column:1 / 2; text-align:left}
+    .ritem .actions{grid-column:2 / 3; justify-self:end}
+  }
+
+  /* ===================== PRINT STYLES ===================== */
+  @media print{
+    body{
+      background:#fff !important; color:#000 !important; padding:0 !important; font-size:10pt !important;
+    }
+    header, .top-bar, .budgetbar, .pool-controls, .table-wrap, .gear-sections, .tabs, .quick-actions,
+    .add-btn, .actions, .choice-btns, #soldierTable, #gearList, #view-ref, #view-powers-kb, #view-items-kb,
+    .aristo-banner, .toast, .modal-overlay, .pwopt:not(.sel), .pwopt .info-icon, .special-box{
+      display:none !important;
+    }
+    .wrap{max-width:100% !important; padding:0 !important; margin:0 !important}
+    .view{display:none !important}
+    #view-build{display:block !important}
+    .section, .meta-card, .slot, .ritem{
+      background:none !important; border:1px solid #333 !important; color:#000 !important;
+      border-radius:0 !important; box-shadow:none !important; margin:6px 0 !important; padding:8px 10px !important;
+      page-break-inside:avoid;
+    }
+    h1, h2, h3, h4, b, .stat-box .val{color:#000 !important}
+    .print-only{display:block !important}
+    .no-print{display:none !important}
+    .custom-name, input, select{
+      border:none !important; border-bottom:none !important; background:transparent !important;
+      color:#000 !important; font-weight:bold !important; padding:0 !important;
+      appearance:none !important; -webkit-appearance:none !important;
+    }
+    .pwopt.sel{
+      background:none !important; border:1px solid #555 !important; color:#000 !important;
+      box-shadow:none !important; font-weight:bold !important; padding:2px 6px !important;
+    }
+    .pwopt .tn{background:#eee !important; color:#000 !important; border:1px solid #888 !important}
+    .pwopt .timing-chip{background:#eee !important; color:#000 !important; border:1px solid #888 !important}
+    .ritem .num, .ritem .gear-notes, .ritem .stats-mini, .pill, .type-tag{color:#222 !important}
+    .stat-box{border:1px solid #666 !important; background:#f7f7f7 !important}
+    .stat-box .lbl{color:#333 !important}
+    .print-track{display:flex; align-items:center; gap:4px; margin-top:6px; flex-wrap:wrap}
+    .track-box{width:12px; height:12px; border:1px solid #000; display:inline-block}
+  }
+  .print-only{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <h1 class="brand-title">Stargrave Crew Builder</h1>
+  <div class="brand-sub">Independent Crew Roster &amp; Battle Management System</div>
+</header>
+
+<div class="wrap">
+
+  <!-- Top Toolbar -->
+  <div class="top-bar">
+    <div class="tabs">
+      <button class="tab active" data-v="build">🛠 Crew Builder</button>
+      <button class="tab" data-v="powers-kb">⚡ Powers &amp; Spells KB</button>
+      <button class="tab" data-v="items-kb">📦 Armoury &amp; Items KB</button>
+      <button class="tab" data-v="ref">📖 Backgrounds Codex</button>
+    </div>
+    <div class="quick-actions">
+      <div class="save-status"><span class="save-dot"></span> <span id="autoSaveLabel">Auto-saved</span></div>
+      <button class="btn btn-cyan" id="printBtn" title="Print a ready-to-play tabletop crew roster">🖨 Print Roster</button>
+      <button class="btn" id="copyTextBtn" title="Copy crew list formatted for Discord / Forums">📋 Copy Text</button>
+      <button class="btn" id="exportBtn" title="Export roster to JSON file">💾 Export</button>
+      <label class="btn" style="margin:0;cursor:pointer" title="Load roster from JSON file">
+        📂 Import <input type="file" id="importInput" accept=".json" style="display:none">
+      </label>
+      <button class="btn btn-bad" id="resetBtn" title="Reset current roster to blank">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- Print Roster Header -->
+  <div class="print-only" style="margin-bottom:12px;border-bottom:2px solid #000;padding-bottom:6px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <h1 style="margin:0;font-size:18pt;text-transform:uppercase">STARGRAVE CREW ROSTER</h1>
+        <div style="font-size:10pt" id="printMetaLine">Crew: Unnamed Crew · Ship: Unnamed Vessel</div>
+      </div>
+      <div style="text-align:right;font-size:9pt" id="printBudgetLine">Budget: 400cr | Spent: 0cr | Unspent: 400cr</div>
+    </div>
+  </div>
+
+  <!-- ===================== 1. CREW BUILD VIEW ===================== -->
+  <div class="view active" id="view-build">
+
+    <!-- Crew Metadata Card -->
+    <div class="meta-card">
+      <div class="meta-field">
+        <label>Crew / Gang Name</label>
+        <input type="text" id="crewName" placeholder="e.g. Cerberus Syndicate">
+      </div>
+      <div class="meta-field">
+        <label>Ship Name</label>
+        <input type="text" id="shipName" placeholder="e.g. The Iron Wanderer">
+      </div>
+      <div class="meta-field">
+        <label>Notes / Campaign Level</label>
+        <input type="text" id="campaignNotes" placeholder="e.g. Level 15 / Standard Campaign">
+      </div>
+    </div>
+
+    <!-- Campaign & House Rules Card -->
+    <div class="rules-card no-print">
+      <div class="rules-hd" id="toggleHouseRules">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:16px">⚖️</span>
+          <span style="font-weight:700;font-size:13.5px;letter-spacing:.5px">Campaign &amp; House Rules</span>
+          <span class="pill" id="houseRulesActivePill">0 Active</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11.5px;color:var(--muted)">Optional squad &amp; campaign constraints</span>
+          <span class="rules-chevron" id="rulesChevron">▾</span>
+        </div>
+      </div>
+      <div class="rules-body" id="houseRulesBody">
+        <div class="rule-item">
+          <label class="switch">
+            <input type="checkbox" id="ruleMaxTwoSpecs">
+            <span class="slider"></span>
+          </label>
+          <div class="rule-info">
+            <div class="rule-name">
+              Limit Duplicate Specialists
+              <span class="pill" style="font-size:10px;padding:1px 7px;color:var(--gold);border-color:rgba(255,207,92,0.35);background:rgba(255,207,92,0.08)">Max 2 of same type</span>
+            </div>
+            <div class="rule-desc">Prevents recruiting more than 2 soldiers of any single specialist class (e.g. maximum 2 Snipers or 2 Armoured Troopers). Standard 4-specialist squad cap still applies.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. Leaders: Captain & First Mate -->
+    <div class="section">
+      <div class="section-hd">
+        <h3>1 · Captain &amp; First Mate</h3>
+        <div class="pills">
+          <span class="pill" id="capPill">Captain: 0 / 6 Powers</span>
+          <span class="pill" id="fmPill">First Mate: 0 / 4 Powers</span>
+        </div>
+      </div>
+      <div class="note">Captains pick <b>6</b> powers. First Mates pick <b>4</b> powers (rolls at +2 difficulty). Paladin is Captain-only.</div>
+
+      <div class="picker">
+        <!-- Captain Slot -->
+        <div class="slot">
+          <div class="slot-title">
+            <h4>Captain</h4>
+            <span class="role-badge">Level 15 · 6 Powers</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="capName" placeholder="Captain's Name" style="width:100%;background:#09101f;border:1px solid var(--line);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px;outline:none">
+          </div>
+          <select id="capSel"><option value="">— Choose Captain Background —</option></select>
+
+          <!-- Interactive Captain Stats -->
+          <div class="stat-card" id="capStatCard" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Captain Stat-Line</span>
+              <span style="font-size:11px;color:var(--good);font-weight:700" id="capStatNote">Base + Background</span>
+            </div>
+            <div class="stat-grid" id="capStatGrid"></div>
+            <div class="stat-choices" id="capStatChoices" style="display:none"></div>
+          </div>
+
+          <div class="pwpick" id="capPw"></div>
+        </div>
+
+        <!-- First Mate Slot -->
+        <div class="slot">
+          <div class="slot-title">
+            <h4>First Mate</h4>
+            <span class="role-badge">Level 0 · 4 Powers</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="fmName" placeholder="First Mate's Name" style="width:100%;background:#09101f;border:1px solid var(--line);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px;outline:none">
+          </div>
+          <select id="fmSel"><option value="">— Choose First Mate Background —</option></select>
+
+          <!-- Interactive First Mate Stats -->
+          <div class="stat-card" id="fmStatCard" style="display:none">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase">First Mate Stat-Line</span>
+              <span style="font-size:11px;color:var(--good);font-weight:700" id="fmStatNote">Base + Background</span>
+            </div>
+            <div class="stat-grid" id="fmStatGrid"></div>
+            <div class="stat-choices" id="fmStatChoices" style="display:none"></div>
+          </div>
+
+          <div class="pwpick" id="fmPw"></div>
+        </div>
+      </div>
+      <div class="note" id="aristoNote"></div>
+    </div>
+
+    <!-- 2. Recruit Crew -->
+    <div class="section">
+      <div class="section-hd">
+        <h3>2 · Recruit Crew</h3>
+        <div class="pills">
+          <span class="pill" id="crewCountPill">0 / 8 Crew</span>
+          <span class="pill" id="specCountPill">0 / 4 Specialists Max</span>
+          <span class="pill" id="ruleSpecNoticePill" style="display:none;background:rgba(255,207,92,0.12);color:var(--gold);border-color:rgba(255,207,92,0.35)">⚖️ Max 2 per Specialist</span>
+        </div>
+      </div>
+      <div class="note">A starting crew has up to <b>8</b> soldiers. <b>Maximum of 4 Specialist soldiers allowed</b> by Stargrave rules. Free crew count toward the 8 cap.</div>
+
+      <!-- Active Crew Roster -->
+      <div class="roster" id="roster">
+        <div class="empty">No crew recruited yet. Browse the recruitment roster below to recruit up to 8 soldiers.</div>
+      </div>
+
+      <!-- Soldier Recruitment Catalog Controls -->
+      <div class="pool-controls">
+        <div class="filter-group">
+          <button class="filter-btn active" data-sf="all">All (32)</button>
+          <button class="filter-btn" data-sf="Standard">Standard (16)</button>
+          <button class="filter-btn" data-sf="Specialist">Specialists (16)</button>
+          <span style="color:var(--line);margin:0 4px">|</span>
+          <button class="filter-btn active" data-sb="all">All Books</button>
+          <button class="filter-btn" data-sb="Core">Core</button>
+          <button class="filter-btn" data-sb="TLP">TLP</button>
+          <button class="filter-btn" data-sb="Q37">Q37</button>
+          <button class="filter-btn" data-sb="BE">BE</button>
+        </div>
+        <input type="text" id="soldierSearch" class="search-input" placeholder="Search soldiers, weapons, abilities…">
+      </div>
+
+      <!-- Soldier Table -->
+      <div class="table-wrap">
+        <table id="soldierTable">
+          <thead>
+            <tr>
+              <th>Soldier</th>
+              <th>Type</th>
+              <th>M</th>
+              <th>F</th>
+              <th>S</th>
+              <th>A</th>
+              <th>W</th>
+              <th>H</th>
+              <th>Cost</th>
+              <th>Book</th>
+              <th style="text-align:right">Recruit</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 3. Gear & Ship Upgrades -->
+    <div class="section">
+      <div class="section-hd">
+        <h3>3 · Gear &amp; Ship Upgrades</h3>
+        <div class="pills">
+          <span class="pill" id="gearSpentPill">0cr Spent on Gear</span>
+        </div>
+      </div>
+
+      <!-- Aristocrat Ship Upgrade Perk Banner -->
+      <div class="aristo-banner" id="aristoBanner" style="display:none">
+        <div class="aristo-banner-text">
+          👑 <b>Aristocrat Privilege:</b> Entitled to <b>1 Free Ship Upgrade</b> (up to 500cr value)!
+        </div>
+        <div>
+          <select id="aristoFreeUpgrade" class="aristo-select">
+            <option value="">— Claim Free Ship Upgrade —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="note">Standard creation-phase weapons, armour, equipment, and starship upgrades.</div>
+      <div class="gear-sections" id="gearSections"></div>
+      <div class="print-only" id="printPurchasedGear" style="margin-top:10px;font-size:10pt"></div>
+    </div>
+
+  </div>
+
+  <!-- ===================== 2. POWERS & SPELLS KB BROWSER ===================== -->
+  <div class="view" id="view-powers-kb">
+    <div class="kb-section">
+      <div class="kb-header-row">
+        <div class="kb-title-block">
+          <h2>⚡ Powers &amp; Abilities Knowledge Base</h2>
+          <div class="kb-sub">Comprehensive codex of all 70 psychic powers, combat tech, and mystical abilities in Stargrave.</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted)" id="powersKBCount">Showing 70 Powers</div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="kb-search-bar">
+        <input type="text" id="powersKBSearch" placeholder="Search powers by name, rules, keywords (e.g. heal, robot, loot, damage, wall)...">
+        <select id="powersKBBgFilter" style="max-width:260px;font-size:12.5px">
+          <option value="all">All Backgrounds</option>
+        </select>
+        <button class="btn btn-cyan" id="powersKBReset">↺ Reset Filters</button>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="kb-filters">
+        <div class="kb-filter-row">
+          <span class="kb-filter-lbl">Timing:</span>
+          <button class="kb-pill active" data-ptiming="all">All</button>
+          <button class="kb-pill" data-ptiming="during">⚔️ During Game</button>
+          <button class="kb-pill" data-ptiming="before">⏳ Before Game</button>
+          <button class="kb-pill" data-ptiming="after">🏆 After Game</button>
+        </div>
+        <div class="kb-filter-row">
+          <span class="kb-filter-lbl">Category:</span>
+          <button class="kb-pill active" data-pcat="all">All</button>
+          <button class="kb-pill" data-pcat="Line of Sight">Line of Sight</button>
+          <button class="kb-pill" data-pcat="Self">Self</button>
+          <button class="kb-pill" data-pcat="Touch">Touch</button>
+          <button class="kb-pill" data-pcat="Area">Area</button>
+          <button class="kb-pill" data-pcat="Out of Game">Out of Game</button>
+          <button class="kb-pill" data-pcat="Reaction">Reaction / Pre-game</button>
+        </div>
+        <div class="kb-filter-row">
+          <span class="kb-filter-lbl">Strain:</span>
+          <button class="kb-pill active" data-pstrain="all">All</button>
+          <button class="kb-pill" data-pstrain="0">Strain 0 (Safe)</button>
+          <button class="kb-pill" data-pstrain="1">Strain 1</button>
+          <button class="kb-pill" data-pstrain="2">Strain 2</button>
+        </div>
+        <div class="kb-filter-row">
+          <span class="kb-filter-lbl">Target TN:</span>
+          <button class="kb-pill active" data-ptn="all">All</button>
+          <button class="kb-pill" data-ptn="8">TN 8</button>
+          <button class="kb-pill" data-ptn="10">TN 10</button>
+          <button class="kb-pill" data-ptn="12">TN 12</button>
+          <button class="kb-pill" data-ptn="14">TN 14</button>
+        </div>
+      </div>
+
+      <!-- Powers KB Cards Grid -->
+      <div class="kb-grid" id="powersKBGrid"></div>
+    </div>
+  </div>
+
+  <!-- ===================== 3. ARMOURY & ITEMS KB BROWSER ===================== -->
+  <div class="view" id="view-items-kb">
+    <div class="kb-section">
+      <div class="kb-header-row">
+        <div class="kb-title-block">
+          <h2>📦 Armoury, Equipment &amp; Loot Knowledge Base</h2>
+          <div class="kb-sub">Database of starting gear, military hardware, campaign loot, advanced tech, and alien artifacts.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:12px;color:var(--muted)" id="itemsKBCount">Showing 47 Items</div>
+          <div class="kb-view-toggle">
+            <button class="kb-view-btn active" id="itemsViewCardsBtn">Cards</button>
+            <button class="kb-view-btn" id="itemsViewTableBtn">Table</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="kb-search-bar">
+        <input type="text" id="itemsKBSearch" placeholder="Search weapons, armour, equipment, modifiers, rules (e.g. plasma, +1 Dmg, deck, shield)...">
+        <button class="btn btn-cyan" id="itemsKBReset">↺ Reset Filters</button>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="kb-filters">
+        <div class="kb-filter-row">
+          <span class="kb-filter-lbl">Category:</span>
+          <button class="kb-pill active" data-icat="all">All</button>
+          <button class="kb-pill" data-icat="Weapons">Weapons</button>
+          <button class="kb-pill" data-icat="Armour &amp; Shields">Armour &amp; Shields</button>
+          <button class="kb-pill" data-icat="Field Equipment">Field Equipment</button>
+          <button class="kb-pill" data-icat="Starship Upgrades">Starship Upgrades</button>
+          <button class="kb-pill" data-icat="Alien Artifacts">Alien Artifacts</button>
+        </div>
+        <div class="kb-filter-row">
+          <span class="kb-filter-lbl">Source / Type:</span>
+          <button class="kb-pill active" data-iavail="all">All</button>
+          <button class="kb-pill" data-iavail="creation">Creation Phase (Buyable)</button>
+          <button class="kb-pill" data-iavail="loot">Advanced Tech / Loot</button>
+          <button class="kb-pill" data-iavail="artifact">Alien Artifacts</button>
+        </div>
+        <div class="kb-filter-row">
+          <span class="kb-filter-lbl">Gear Slots:</span>
+          <button class="kb-pill active" data-islots="all">All</button>
+          <button class="kb-pill" data-islots="0">0 Slots (Implant/Ship)</button>
+          <button class="kb-pill" data-islots="1">1 Slot</button>
+          <button class="kb-pill" data-islots="2">2 Slots (Heavy)</button>
+        </div>
+      </div>
+
+      <!-- Items Container: Cards Grid or Table View -->
+      <div id="itemsKBCardsContainer" class="kb-grid"></div>
+      <div id="itemsKBTableContainer" class="table-wrap" style="display:none;margin-top:14px">
+        <table id="itemsKBTable">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Category</th>
+              <th>Cost / Value</th>
+              <th>Slots</th>
+              <th>Specs / Modifiers</th>
+              <th>Availability</th>
+              <th>Rules &amp; Description</th>
+              <th style="text-align:right">Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== 4. REFERENCE CODEX VIEW ===================== -->
+  <div class="view" id="view-ref">
+
+    <div class="ref-subtabs">
+      <button class="ref-subtab active" data-rt="bg">Backgrounds Codex (14)</button>
+      <button class="ref-subtab" data-rt="soldiers">Soldiers Roster (32)</button>
+    </div>
+
+    <!-- Ref Subview 1: Backgrounds -->
+    <div id="ref-sub-bg">
+      <div class="pool-controls" style="margin-top:0">
+        <div class="filter-group">
+          <button class="filter-btn active" data-f="all">All (14)</button>
+          <button class="filter-btn" data-f="core">Core Rulebook</button>
+          <button class="filter-btn" data-f="q37">Quarantine 37</button>
+          <button class="filter-btn" data-f="tlp">The Last Prospector</button>
+          <button class="filter-btn" data-f="be">Bold Endeavour</button>
+        </div>
+        <input id="refSearch" class="search-input" type="text" placeholder="Search background name or power…">
+      </div>
+      <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px" id="refCount"></div>
+      <div class="ref-grid" id="refGrid"></div>
+    </div>
+
+    <!-- Ref Subview 2: Soldiers Codex -->
+    <div id="ref-sub-soldiers" style="display:none">
+      <div class="table-wrap" style="margin-top:10px">
+        <table id="refSoldierTable">
+          <thead>
+            <tr>
+              <th>Soldier</th>
+              <th>Class</th>
+              <th>M</th>
+              <th>F</th>
+              <th>S</th>
+              <th>A</th>
+              <th>W</th>
+              <th>H</th>
+              <th>Cost</th>
+              <th>Book</th>
+              <th>Starting Equipment &amp; Notes</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="no-print" style="text-align:center;color:var(--muted);font-size:12px;padding:30px 20px;border-top:1px solid var(--line);margin-top:40px">
+    Stargrave &copy; Joseph A. McCullough &middot; Osprey Games.<br>
+    Sources: Core Rulebook, Quarantine 37, The Last Prospector, Bold Endeavour, Hope Eternal, Death Vector.
+  </footer>
+
+</div>
+
+<!-- Sticky Budget Bar -->
+<div class="budgetbar no-print" id="budgetbar">
+  <div class="bb-inner">
+    <div class="bb-stats-group">
+      <div class="bb-stat"><div class="v gold" id="bbBudget">400</div><div class="l">Budget</div></div>
+      <div class="bb-stat"><div class="v" id="bbSpent">0</div><div class="l">Spent</div></div>
+      <div class="bb-stat"><div class="v ok" id="bbLeft">400</div><div class="l">Credits Left</div></div>
+    </div>
+
+    <div class="meter">
+      <div class="track"><div class="fill" id="bbFill"></div></div>
+    </div>
+
+    <div class="bb-stats-group">
+      <div class="bb-stat"><div class="v" id="bbCrew">0 / 8</div><div class="l">Crew</div></div>
+      <div class="bb-stat"><div class="v" id="bbSpec">0 / 4</div><div class="l">Specialists</div></div>
+      <div class="bb-stat"><div class="v" id="bbPwSum">0 / 10</div><div class="l">Powers</div></div>
+    </div>
+
+    <div class="bb-warns" id="warnMsg"></div>
+  </div>
+</div>
+
+<!-- Power Detail Modal -->
+<div class="modal-overlay" id="powerModal">
+  <div class="modal-card">
+    <h3>
+      <span id="modalPwName">Power Name</span>
+      <button class="modal-close" id="modalCloseBtn">&times;</button>
+    </h3>
+    <div class="modal-tags">
+      <span class="modal-tag tn" id="modalPwTN">Activation: 10</span>
+      <span class="modal-tag strain" id="modalPwStrain">Strain: 0</span>
+      <span class="modal-tag" id="modalPwType">Line of Sight</span>
+      <span class="modal-tag" id="modalPwTiming">During Game</span>
+    </div>
+    <div class="modal-desc" id="modalPwDesc">Power description text...</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+/* ===================== COMPREHENSIVE DATA ===================== */
+
+const BG = [
+  {name:"Veteran", src:"core", cap:false,
+   role:"Frontline Anchor & Fireteam Commander",
+   stats:"+1 Fight, +1 Health, then choose one: +1 Move / +1 Fight (total +2) / +1 Shoot",
+   fixed:{f:1, h:1},
+   choices:[{id:"c1", label:"Choose one bonus:", max:1, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight (total +2)",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Armoury","Command","Coordinated Fire","Energy Shield","Fortune","Power Spike","Remote Firing","Target Designation"],
+   desc:"Veterans are hardened survivors of the Last War who served in planetary defence forces, corporate legions, or mercenary fleets. Accustomed to disciplined squad tactics, combined arms, and brutal firefights, they lead from the front with military precision. While they possess no esoteric psychic tricks or genetic rewiring, their mastery of standard weaponry, defensive energy shields, and squad-wide command buffs makes them the most dependable combat leaders in the galaxy.",
+   synergies:{
+     firstMate:"Pairs exceptionally well with a <b>Tekker</b>, <b>Robotics Expert</b>, or <b>Rogue</b>. The Veteran provides brute stopping power and frontline firepower while their tech or stealth partner covers data-hacking, remote electronics, and objective extraction.",
+     crew:"Greatly amplifies standard combat line infantry: <b>Troopers</b>, <b>Sentries</b>, and <b>Armoured Troopers</b>. Specialized heavy weapons like <b>Gunners</b> (Rapid-Fire) and <b>Grenadiers</b> gain massive value from the Veteran's remote fire coordination.",
+     combos:"<code>Command</code> + <code>Coordinated Fire</code> allows the Veteran to activate two friendly soldiers simultaneously to concentrate fire on high-threat targets with +2 Shoot. <code>Remote Firing</code> lets the Veteran trigger a heavy weapon from safe cover, while <code>Energy Shield</code> absorbs counter-fire.",
+     gear:"Heavy Armour or Combat Armour, Carbine or Shotgun, Grenades, and Combat Scanner."
+   },
+   flavor:"Hardened survivor of the Last War. Best armour, best weapons. The straightforward point-and-shoot combat captain.", special:""},
+
+  {name:"Hunter", src:"core", cap:false,
+   role:"Long-Range Marksman & Tracker",
+   stats:"+1 Shoot, +1 Health, then choose one: +1 Move / +1 Fight / +1 Shoot (total +2)",
+   fixed:{s:1, h:1},
+   choices:[{id:"c1", label:"Choose one bonus:", max:1, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot (total +2)",m:{s:1}}] }],
+   powers:["Beast Call","Crack Shot","Camouflage","Control Animal","Power Spike","Study Prey","Target Designation","Weapon Maintenance"],
+   desc:"Hunters make their living tracking high-value bounties, dangerous alien megafauna, and fugitive war criminals across hostile wilderness, toxic swamps, and irradiated badlands. Accustomed to operating alone or in tight scouting patrols, they favor patience, optical camouflage, and pinpoint shooting over raw squad volume. Their specialized toolkit isolates enemies, tracks prey through cover, and commands predatory beasts.",
+   synergies:{
+     firstMate:"Pairs best with close-quarters anchors like <b>Cyborg</b>, <b>Biomorph</b>, or <b>Paladin</b>. While the frontline mate absorbs fire and locks aggressive foes in melee, the Hunter snipes priority targets from elevated perches with impunity.",
+     crew:"<b>Guard Dogs</b> (10cr) are ideal low-cost animal companions for <code>Control Animal</code> and <code>Beast Call</code>. <b>Snipers</b> and <b>Pathfinders</b> mirror the Hunter's extreme range, cover-negating tactics, and battlefield mobility.",
+     combos:"<code>Camouflage</code> renders the Hunter completely immune to shooting attacks beyond 12\". Stacking <code>Study Prey</code> (+2 Shoot, +1 Dmg) with <code>Crack Shot</code> (+2 Dmg, ignores cover) turns standard carbine or rifle shots into devastating one-shot kills.",
+     gear:"Carbine (or campaign Sniper Rifle), Light Armour (maintains full 6\"–7\" movement), Filter Mask, and Combat Scanner."
+   },
+   flavor:"Stalker of valuable prey. Lightly armoured, deadly at range, strong tracking/animal toolkit.", special:""},
+
+  {name:"Rogue", src:"core", cap:false,
+   role:"Skirmisher, Scoundrel & Objective Specialist",
+   stats:"+1 Will, +1 Health, then choose two: +1 Move / +1 Fight / +1 Shoot",
+   fixed:{w:1, h:1},
+   choices:[{id:"c1", label:"Choose two bonuses:", max:2, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Bait and Switch","Bribe","Cancel Power","Concealed Firearm","Data Jump","Fortune","Haggle","Quick-Step"],
+   desc:"Smugglers, gamblers, con artists, and fixers, Rogues thrive in the legal gray zones of the galaxy's lawless fringe. They reject rigid military discipline in favor of misdirection, contingency plans, and quick escapes. In battle, a Rogue rarely fights fair; they trick enemies, swap loot from right under opponents' noses, cancel enemy spells, and keep a backup blaster hidden up their sleeve.",
+   synergies:{
+     firstMate:"Pairs naturally with a combat powerhouse like <b>Veteran</b>, <b>Cyborg</b>, or <b>Biomorph</b>. The combat partner forms an imposing threat that occupies enemy attention while the Rogue slips past battle lines to grab loot and disrupt opposing activations.",
+     crew:"<b>Runners</b>, <b>Hackers</b>, and <b>Chiselers</b> thrive under a Rogue's leadership. Using <code>Bribe</code> on elite enemy threats allows your fast crew to snatch tokens safely.",
+     combos:"<code>Quick-Step</code> grants a bonus 3\" move that ignores rough terrain without costing an action. <code>Bait and Switch</code> instantly swaps two loot tokens within 12\", pulling a contested counter straight into friendly lines. <code>Cancel Power</code> shuts down game-winning enemy psychic abilities.",
+     gear:"Pistol, Light Armour, Deck or Picks, and Smoke Grenades. (Concealed Firearm provides a free extra pistol without using a gear slot!)"
+   },
+   flavor:"Smuggler, gambler, fixer. No body/mind powers — wit, luck, back-up plans, a hidden gun. Flexible generalist.", special:""},
+
+  {name:"Cyborg", src:"core", cap:false,
+   role:"High-Durability Brawler & Tech Hybrid",
+   stats:"+1 Health, then choose two: +1 Move / +1 Fight / +1 Shoot",
+   fixed:{h:1},
+   choices:[{id:"c1", label:"Choose two bonuses:", max:2, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Camouflage","Control Robot","Data Knock","Energy Shield","Power Spike","Quick Step","Target Lock","Temporary Upgrade"],
+   desc:"Cyborgs are former military assets, bounty hunters, or catastrophic-trauma survivors whose bodies have been heavily augmented with mil-spec cybernetics, synthetic muscle fibers, and subdermal plating. Straddling the boundary between human and machine, they boast extraordinary physical durability and unique abilities to network with robots and jam electronic systems.",
+   synergies:{
+     firstMate:"The absolute premier pairing is a <b>Robotics Expert</b> First Mate, who can heal the Cyborg with <code>Repair Robot</code> and supercharge them with <code>Temporary Upgrade</code>. Alternatively, pair with a <b>Mystic</b> for dark energy support and healing.",
+     crew:"Greatly benefits from robotic crewmates: <b>Q-bots</b> and <b>Mules</b> (Q37). Works alongside <b>Armoured Troopers</b>, <b>Bruisers</b>, or <b>Strikers</b> to create an impenetrable frontline vanguard.",
+     combos:"<code>Target Lock</code> (+3 Shoot on next attack) pairs lethally with high-damage weapons. <code>Temporary Upgrade</code> boosts allied robots/cyborgs with +2 Fight and +1 Armour. <code>Power Spike</code> guarantees a clutch combat roll.",
+     gear:"Combat Armour or Heavy Armour, Shotgun or Carbine, Combat Scanner, and Bionic Implants (Bionic Arm/Eye in campaign play)."
+   },
+   flavor:"Man-machine war asset gone freelance. Mobile, durable, strong tech-combat crossover powers.", special:""},
+
+  {name:"Biomorph", src:"core", cap:false,
+   role:"Adaptive Melee Juggernaut & Bio-Mutant",
+   stats:"+1 Health, then choose two: +1 Move / +1 Fight / +1 Shoot",
+   fixed:{h:1},
+   choices:[{id:"c1", label:"Choose two bonuses:", max:2, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Adrenaline Surge","Armour Plates","Camouflage","Fling","Regenerate","Restructure Body","Toxic Claws","Toxic Secretion"],
+   desc:"Products of illegal gene-laboratories, mutagenic alien environments, or vat-grown experimental battalions. Biomorphs possess radically unstable biology that can shift bone density, exude neurotoxins, and spontaneously regenerate shattered tissue in the heat of combat. They are ferocious close-combat monsters capable of tearing through bulkhead doors and powered exosuits.",
+   synergies:{
+     firstMate:"Needs a First Mate who covers long-range shooting and technical tasks: <b>Tekker</b>, <b>Hunter</b>, or <b>Investigator</b>. The partner unlocks computers and controls firing lanes while the Biomorph charges the primary threat.",
+     crew:"Pair with <b>Runners</b> to grab loot while the Biomorph absorbs all enemy focus, or <b>Strikers</b> and <b>Bruisers</b> (TLP) to build an aggressive melee squad that swarms and crushes opposing crews.",
+     combos:"<code>Armour Plates</code> gives a permanent +1 Armour buff for the entire game. Combine with <code>Regenerate</code> (recovers 2 Health every activation) and <code>Restructure Body</code> to create an unkillable frontline terror. <code>Toxic Claws</code> bypasses heavy armor with ongoing poison.",
+     gear:"Hand Weapon or Knife (to keep slots open for natural weapons and loot), Light Armour (augmented by Armour Plates), and Combat Stimms."
+   },
+   flavor:"Gene-tweaked / tank-born survivor. Self-buffing melee bruiser that reshapes its own body.", special:""},
+
+  {name:"Psionicist", src:"core", cap:false,
+   role:"Kinetic Controller & Battlefield Manipulator",
+   stats:"+2 Will, +1 Health, then choose one: +1 Move / +1 Fight / +1 Shoot",
+   fixed:{w:2, h:1},
+   choices:[{id:"c1", label:"Choose one bonus:", max:1, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Break Lock","Destroy Weapon","Lift","Psionic Fire","Psychic Shield","Pull","Suggestion","Wall of Force"],
+   desc:"Gifted with rare telepathic and telekinetic mental mutations, Psionicists manipulate gravity, matter, and thermal energy through raw mental discipline. Often feared and hunted as dangerous freaks by the pirate fleets, they can tear locked loot containers apart with a glance, levitate allies over barricades, and erect impenetrable forcefields across open corridors.",
+   synergies:{
+     firstMate:"Pairs best with a dedicated combat soldier: <b>Veteran</b>, <b>Cyborg</b>, or <b>Striker</b>. High-Will Psionicists control the board and reshape geometry while the combat mate handles direct firearm engagements.",
+     crew:"<b>Sentries</b> and <b>Troopers</b> hold lanes carved out by <code>Wall of Force</code>. <b>Grenadiers</b> and <b>Burners</b> profit when the Psionicist uses <code>Pull</code> or <code>Lift</code> to expose hidden enemy clusters.",
+     combos:"<code>Pull</code> snatches distant physical or data loot counters up to 6\" directly toward your crew. <code>Lift</code> levitates an ally over sheer walls. <code>Wall of Force</code> creates temporary solid cover across open corridors.",
+     gear:"Pistol, Light Armour, Filter Mask, and Picks (Break Lock handles most security without gear)."
+   },
+   flavor:"Telekinetic / pyrokinetic mind. Huge Will. The force-powers background.", special:""},
+
+  {name:"Mystic", src:"core", cap:false,
+   role:"Support Healer, Controller & Void Duelist",
+   stats:"+2 Will, +1 Health, then choose one: +1 Move / +1 Fight / +1 Shoot",
+   fixed:{w:2, h:1},
+   choices:[{id:"c1", label:"Choose one bonus:", max:1, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Control Animal","Dark Energy","Heal","Life Leach","Mystic Trance","Puppet Master","Suggestion","Void Blade"],
+   desc:"Ascetics of forgotten cosmic orders, void cultists, or dark-matter scholars. Mystics tap into strange metaphysical currents that drift through deep space. They are among the very few beings capable of true biological restoration (<code>Heal</code>), while also wielding horrific mind-bending control powers and blades forged of pure void energy.",
+   synergies:{
+     firstMate:"Exceptional as either Captain or First Mate. Pairs with <b>Veteran</b>, <b>Biomorph</b>, or <b>Paladin</b>. Having a Mystic First Mate guarantees your crew has access to <code>Heal</code> and <code>Puppet Master</code>.",
+     crew:"High-cost Specialists like <b>Armoured Troopers</b>, <b>Snipers</b>, and <b>Gun Fighters</b> become vastly more survivable when backed by the Mystic's healing powers. Inexpensive <b>Recruits</b> and <b>Runners</b> provide screens.",
+     combos:"<code>Mystic Trance</code> grants +2 to the user's next power activation roll, drastically improving odds on high-TN powers like <code>Puppet Master</code> (TN 14). In close quarters, <code>Void Blade</code> (+2 Fight, +1 Dmg) allows the Mystic to defeat dedicated melee soldiers with ease.",
+     gear:"Shield (+1 Fight vs shooting), Light Armour, Hand Weapon, and Medic Kit."
+   },
+   flavor:"Cult witch, monk, or dark-science knight. Healing + control + a nasty Void Blade.", special:""},
+
+  {name:"Robotics Expert", src:"core", cap:false,
+   role:"Droid Commander, Summoner & Support Tech",
+   stats:"+1 Will, then choose two: +1 Move / +1 Fight / +1 Shoot / +1 Health",
+   fixed:{w:1},
+   choices:[{id:"c1", label:"Choose two bonuses:", max:2, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}},{lbl:"+1 Health",m:{h:1}}] }],
+   powers:["Control Robot","Create Robot","Drone","Electromagnetic Pulse","Remote Firing","Remote Guidance","Repair Robot","Re-wire Robot"],
+   desc:"Robotics Experts are master electrical engineers, droid hackers, and mechanical artisans. In a ruined galaxy filled with scrap and abandoned war droids, they assemble mechanical minions on the fly, guide automated heavy turrets with precision telemetry, and reprogram enemy defense drones in the heat of battle.",
+   synergies:{
+     firstMate:"Phenomenal pairing with a <b>Cyborg</b> (whom the Robotics Expert can repair and buff with <code>Repair Robot</code> and <code>Temporary Upgrade</code>), or a <b>Veteran</b> to establish a heavy shooting line.",
+     crew:"Maximum synergy with robotic units: <b>Mule</b> (Q37), <b>Q-bot</b> (Q37), and <b>Codebreaker</b>. Bringing robotic crew means <code>Repair Robot</code> acts as an on-demand heal for your squad.",
+     combos:"<code>Create Robot</code> (TN 12) conjures a free robotic soldier to fight in your squad for the scenario. <code>Drone</code> flies ahead to spot targets, granting +1 Shoot to allies, while <code>Remote Guidance</code> boosts a heavy Gunner.",
+     gear:"Carbine, Light Armour, Deck, Workshop Ship Upgrade (grants 50% discount on robot repairs)."
+   },
+   flavor:"Builds and networks robots better than anyone. The summoner archetype.", special:""},
+
+  {name:"Tekker", src:"core", cap:false,
+   role:"High-Tech Infiltrator, Hacker & Transporter",
+   stats:"+2 Will, then choose two: +1 Move / +1 Fight / +1 Shoot / +1 Health",
+   fixed:{w:2},
+   choices:[{id:"c1", label:"Choose two bonuses:", max:2, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}},{lbl:"+1 Health",m:{h:1}}] }],
+   powers:["Anti-gravity Projection","Data Jump","Data Knock","Data Skip","Drone","Electromagnetic Pulse","Holographic Wall","Transport"],
+   desc:"Elite scavengers and high-technology archaeologists who unlock the dormant secrets of pre-war computing networks and dimensional translocators. Tekkers bypass security protocols in milliseconds, distort line of sight with holographic decoys, and phase matter across space.",
+   synergies:{
+     firstMate:"Arguably the most universally useful First Mate in the entire game. Pairs brilliantly with any combat-focused Captain (<b>Veteran</b>, <b>Hunter</b>, <b>Biomorph</b>, or <b>Paladin</b>), providing remote data looting and repositioning.",
+     crew:"Complements fast objective grabbers: <b>Runners</b>, <b>Chiselers</b>, and <b>Hackers</b>. Troopers and Sentries gain clean defensive vantage points through <code>Holographic Wall</code>.",
+     combos:"<code>Data Knock</code> unlocks data loot from 12\" away without needing physical contact. <code>Data Skip</code> shifts loot markers toward your extraction point. <code>Transport</code> teleports a model 9\" across impassable terrain or directly onto a loot token.",
+     gear:"Deck, Light Armour, Carbine, Combat Scanner, and Holographic Decoy."
+   },
+   flavor:"Master of recovered high technology. Battlefield control + mobility.", special:""},
+
+  {name:"Aristocrat", src:"q37", cap:false,
+   role:"Financier, Commander & Resource Multiplier",
+   stats:"+1 Will, +1 Health, then choose one: +1 Will (total +2) / +1 Health (total +2) / +1 Fight / +1 Shoot",
+   fixed:{w:1, h:1},
+   choices:[{id:"c1", label:"Choose one bonus:", max:1, opts:[{lbl:"+1 Will (total +2)",m:{w:1}},{lbl:"+1 Health (total +2)",m:{h:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Bribe","Command","Concealed Firearm","Contacts","Fortune","Indifference","Investments","Inspiring"],
+   desc:"Deposed oligarchs, corporate heirs, or galactic royalty who survived the collapse with their off-world credit vaults and political leverage intact. Aristocrats buy the finest ships, hire premier mercenary retinues, and use bribery and influence to accomplish what blasters cannot.",
+   synergies:{
+     firstMate:"Pair with a battle-hardened archetype like <b>Veteran</b>, <b>Cyborg</b>, or <b>Hunter</b>. The Aristocrat finances top-tier equipment and specialists, while the partner acts as the field enforcer.",
+     crew:"Can hire expensive top-tier Specialist soldiers right at squad creation due to the 450cr (or 500cr dual) budget: <b>Armoured Trooper</b> (150cr), <b>Sniper</b> (100cr), and <b>Gun Fighter</b> (100cr). Regular Troopers love <code>Command</code> and <code>Inspiring</code>.",
+     combos:"<code>Investments</code> yields 20–50 bonus credits after every scenario, quickly compounding crew wealth. <code>Indifference</code> makes uncontrolled alien monsters ignore the Aristocrat. <code>Bribe</code> strips actions from dangerous enemy specialists.",
+     gear:"Concealed Firearm, Light Armour, and any 500cr Ship Upgrade (free via special rule: e.g. Luxury Cabins, Medical Bay, or Workshop!)."
+   },
+   flavor:"Privileged, wealthy, well-connected. Leans on money, buffs, leadership.",
+   special:"<b>Aristocrat Rules:</b><ul><li>Free ship upgrade up to 500cr value.</li><li>One Aristocrat leader &rarr; <b>450cr</b> budget; both &rarr; <b>500cr</b>.</li></ul>"},
+
+  {name:"Investigator", src:"tlp", cap:false,
+   role:"Detective, Info-Broker & Pistol Gunslinger",
+   stats:"Choose two: +2 Will / +2 Health / +1 Move / +1 Fight / +1 Shoot",
+   fixed:{},
+   choices:[{id:"c1", label:"Choose two bonuses:", max:2, opts:[{lbl:"+2 Will",m:{w:2}},{lbl:"+2 Health",m:{h:2}},{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Bait and Switch","Camouflage","Contacts","Indifference","Information Broker","Pistol Expert","Smash and Grab","Suggestion"],
+   desc:"Independent detectives, intelligence fixers, and corporate spies who uncover conspiracies in mining colonies and frontier outposts. They specialize in interrogating systems, gathering intelligence on enemy objectives, and deadly close-range gunplay.",
+   synergies:{
+     firstMate:"Pairs great with <b>Veteran</b>, <b>Rogue</b>, or <b>Fatewinder</b> for a flexible, highly tactical squad.",
+     crew:"Synergizes with <b>Gun Fighters</b> (Q37), <b>Pathfinders</b>, and <b>Runners</b>. Troopers provide long-range rifle support while the Investigator operates inside structures.",
+     combos:"<code>Pistol Expert</code> allows the Investigator to fire pistols twice per turn or shoot while pinned in hand-to-hand combat. <code>Smash and Grab</code> lets you pick up loot without incurring the standard movement penalty, enabling hit-and-run grabs.",
+     gear:"Dual Pistols, Light Armour, Deck, Picks, and Filter Mask."
+   },
+   flavor:"Reporter / detective / info-broker. Wins without a gunfight. Very flexible stat line.", special:""},
+
+  {name:"Fatewinder", src:"tlp", cap:false,
+   role:"Probability Manipulator & Dice Bender",
+   stats:"+1 Will, +1 Health, then +1 Will or +1 Health, then +1 Move / +1 Fight / +1 Shoot",
+   fixed:{w:1, h:1},
+   choices:[
+     {id:"c1", label:"Step 1 — Pick one bonus:", max:1, opts:[{lbl:"+1 Will (total +2)",m:{w:1}},{lbl:"+1 Health (total +2)",m:{h:1}}]},
+     {id:"c2", label:"Step 2 — Pick one bonus:", max:1, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}]}
+   ],
+   powers:["Adrenaline Surge","Command","Fortune","Mystic Trance","Probability Curve","Saving Grace","Seize the Initiative","Treasure Seeker"],
+   desc:"Mystical navigators and probability seers who perceive reality as a branching lattice of possible futures. A Fatewinder gently nudges outcomes: nudging a bullet a millimeter to the left, anticipating an ambush, or bending luck so a fatal wound misses vital organs.",
+   synergies:{
+     firstMate:"Superb partner for high-stakes, volatile combat leaders like <b>Hunter</b>, <b>Psionicist</b>, or <b>Biomorph</b> whose activations decide the game.",
+     crew:"Protects irreplaceable Specialist soldiers: <b>Snipers</b>, <b>Burners</b>, and <b>Armoured Troopers</b>. When an expensive soldier is shot, the Fatewinder alters destiny to keep them alive.",
+     combos:"<code>Seize the Initiative</code> forces initiative rerolls to secure crucial round-one activations. <code>Probability Curve</code> forces enemies to reroll critical hits or successful saves. <code>Saving Grace</code> completely prevents death, reviving a downed model at 1 Health.",
+     gear:"Carbine, Light Armour, Medic Kit, and Force Field Belt."
+   },
+   flavor:"Sees probable outcomes across timelines. Luck + initiative + loot. Reliable.", special:""},
+
+  {name:"Paladin", src:"be", cap:true,
+   role:"Righteous Juggernaut & Defensive Crusader",
+   stats:"+1 Fight, +1 Will, then choose one: +1 Move / +1 Fight (total +2) / +1 Shoot",
+   fixed:{f:1, w:1},
+   choices:[{id:"c1", label:"Choose one bonus:", max:1, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight (total +2)",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}] }],
+   powers:["Armoury","Cancel Power","Contacts","Mystic Trance","Righteous Fury","Thunderstrike","Void Blade"],
+   desc:"Sworn knights of ancient chivalric covenants or zealous frontier protectors. Paladins wear heavy battle plate, carry ballistic energy shields, and wield crackling void blades into the heart of darkness. Bound by their oath to donate 10% of campaign spoils, they are unstoppable combat anchors.",
+   synergies:{
+     firstMate:"<b>Captain Only!</b> Because Paladins are restricted to 1-slot firearms, their First Mate MUST provide the crew's long-range rifle fire and technical utility: <b>Tekker</b>, <b>Hunter</b>, or <b>Robotics Expert</b> are the essential First Mates.",
+     crew:"<b>Medics</b> (100cr) keep the Paladin patched up on the frontline. <b>Troopers</b> and <b>Sentries</b> fire over the Paladin's shield, while <b>Hackers</b> secure data tokens.",
+     combos:"Carrying a <b>Shield</b> grants +1 Fight against ALL shooting attacks. Combine with <code>Void Blade</code> (+2 Fight, +1 Dmg) and <code>Righteous Fury</code> for a staggering +4 Fight and +3 Damage in melee, cleaving through bosses and elite foes.",
+     gear:"Shield (critical for +1 Fight vs shooting!), Combat Armour or Heavy Armour, Pistol, and Hand Weapon."
+   },
+   flavor:"Knight-errant: shield, void blade, heavy armour. Tanky and righteous. Only 7 powers.",
+   special:"<b>Paladin Rules:</b><ul><li><b>Captain only.</b></li><li>No firearm &gt; 1 gear slot.</li><li>With a shield: +1 Fight vs shooting attacks.</li><li>Must donate 10% of all credits earned.</li></ul>"},
+
+  {name:"Time-Walker", src:"be", cap:false,
+   role:"Temporal Skirmisher & Chrono-Infiltrator",
+   stats:"+1 Will, +1 Health, then +1 Will or +1 Health, then +1 Move / +1 Fight / +1 Shoot",
+   fixed:{w:1, h:1},
+   choices:[
+     {id:"c1", label:"Step 1 — Pick one bonus:", max:1, opts:[{lbl:"+1 Will (total +2)",m:{w:1}},{lbl:"+1 Health (total +2)",m:{h:1}}]},
+     {id:"c2", label:"Step 2 — Pick one bonus:", max:1, opts:[{lbl:"+1 Move",m:{m:1}},{lbl:"+1 Fight",m:{f:1}},{lbl:"+1 Shoot",m:{s:1}}]}
+   ],
+   powers:["Bait and Switch","Bounce Back","Concealed Firearm","Fortune","Heal","Probability Curve","Saving Grace","Quick Step"],
+   desc:"Temporal travelers or survivors of chrono-displacement experiments who exist partially desynchronized from the time stream. They slip between seconds to avoid incoming blaster bolts, reverse catastrophic injuries before they settle into tissue, and repeat actions until perfected.",
+   synergies:{
+     firstMate:"Pairs wonderfully with a steadfast, heavy combat leader: <b>Veteran</b>, <b>Cyborg</b>, or <b>Paladin</b>. The partner anchors the line while the Time-Walker phases through enemy positions.",
+     crew:"<b>Runners</b>, <b>Chiselers</b>, and <b>Terrain Experts</b> (TLP) benefit from the temporal distractions created by the Time-Walker.",
+     combos:"<code>Bounce Back</code> instantly heals 3 Health or removes the Stunned condition upon taking damage. <code>Quick Step</code> gives bonus free moves. <code>Fortune</code> and <code>Probability Curve</code> let you rerun bad rolls until they succeed.",
+     gear:"Carbine or Pistol, Light Armour, Jump Booster, and Holographic Decoy."
+   },
+   flavor:"Nudges seconds forward/back — blink-dodge or re-attempt a failed action. Slippery, survivable.", special:""}
+];
+
+const SRC = {
+  core:{label:"Core Rulebook",cls:"core"},
+  q37:{label:"Quarantine 37",cls:"q37"},
+  tlp:{label:"The Last Prospector",cls:"tlp"},
+  be:{label:"Bold Endeavour",cls:"be"},
+  quad:{label:"Quarantine 37",cls:"q37"},
+  hope:{label:"Bold Endeavour",cls:"be"}
+};
+
+// 70 Stargrave Powers with target numbers, strain, category, and effect rules
+const POWERS_DATA = {
+  "Adrenaline Surge": { tn: 8, strain: 1, type: "Line of Sight", desc: "Gain +1 Action on this activation, or immediately make a bonus Move action." },
+  "Anti-gravity Projection": { tn: 10, strain: 0, type: "Line of Sight", desc: "Target terrain piece or loot token within 12\" becomes weightless and can be moved up to 4\"." },
+  "Armour Plates": { tn: 8, strain: 0, type: "Self", desc: "Permanent +1 Armour for the rest of the game (max Armour 15)." },
+  "Armoury": { tn: 10, strain: 0, type: "Out of Game (B)", desc: "Crew may field one suit of Combat Armour with no upkeep cost, or grant +1 Damage to one standard firearm for next game." },
+  "Bait and Switch": { tn: 10, strain: 0, type: "Line of Sight", desc: "Swap the positions of two loot tokens within 12\" of the user." },
+  "Beast Call": { tn: 10, strain: 0, type: "Line of Sight", desc: "Summon a wild alien beast to enter from a random board edge under your temporary command." },
+  "Bounce Back": { tn: 10, strain: 1, type: "Self", desc: "Immediately recover from Stunned or heal 3 Health after sustaining damage." },
+  "Break Lock": { tn: 10, strain: 0, type: "Touch / 6\"", desc: "Automatically unlock any physical loot token without needing physical picks." },
+  "Bribe": { tn: 12, strain: 0, type: "Line of Sight", desc: "Target enemy soldier loses 1 action on their next activation (Will check resists)." },
+  "Camouflage": { tn: 8, strain: 0, type: "Self", desc: "Figures farther than 12\" cannot draw line of sight to shoot at this figure." },
+  "Cancel Power": { tn: 12, strain: 1, type: "Line of Sight", desc: "Instantly dispel an active ongoing power effect anywhere within 16\"." },
+  "Command": { tn: 8, strain: 0, type: "Line of Sight", desc: "Activate a friendly soldier within 12\" immediately, even out of standard soldier phase." },
+  "Concealed Firearm": { tn: 8, strain: 0, type: "Self", desc: "Draw a hidden backup pistol (+1 Shoot bonus on first shot; does not use a gear slot)." },
+  "Contacts": { tn: 10, strain: 0, type: "Out of Game (A)", desc: "+20 bonus to any post-game exploration or trading roll." },
+  "Control Animal": { tn: 10, strain: 0, type: "Line of Sight", desc: "Take control of an uncontrolled creature within 12\" for remainder of game." },
+  "Control Robot": { tn: 10, strain: 0, type: "Line of Sight", desc: "Take control of an enemy or uncontrolled robotic figure (opposed Will test)." },
+  "Coordinated Fire": { tn: 10, strain: 0, type: "Line of Sight", desc: "Two friendly figures within 6\" of each other fire at the same target with +2 Shoot." },
+  "Crack Shot": { tn: 10, strain: 1, type: "Self", desc: "Next shooting attack made by the user ignores cover and gains +2 Damage." },
+  "Create Robot": { tn: 12, strain: 0, type: "Out of Game (B)", desc: "Build a robotic helper or drone to fight in your crew for the next scenario." },
+  "Dark Energy": { tn: 12, strain: 2, type: "Line of Sight", desc: "+3 Shoot attack dealing dark energy damage that completely ignores non-shield armour." },
+  "Data Jump": { tn: 10, strain: 0, type: "Line of Sight", desc: "Instantly download data from a visible data loot token within 12\" without physical contact." },
+  "Data Knock": { tn: 8, strain: 0, type: "Line of Sight", desc: "Remotely unlock a data loot token without needing a physical deck." },
+  "Data Skip": { tn: 10, strain: 0, type: "Line of Sight", desc: "Relocate a data loot token up to 6\" across the board." },
+  "Destroy Weapon": { tn: 12, strain: 1, type: "Line of Sight", desc: "Target enemy's primary weapon is destroyed or disabled (Will test resists)." },
+  "Drone": { tn: 10, strain: 0, type: "Touch", desc: "Deploy a reconnaissance drone that provides line of sight and gives +1 Shoot to allies." },
+  "Electromagnetic Pulse": { tn: 12, strain: 1, type: "Area (3\")", desc: "Deals heavy damage to robots and jams high-tech electronic gear in 3\" radius." },
+  "Energy Shield": { tn: 10, strain: 0, type: "Self", desc: "Forms an energy bubble absorbing the next 3 points of shooting damage taken." },
+  "Fling": { tn: 10, strain: 1, type: "Line of Sight", desc: "Telekinetically hurl an enemy figure or heavy obstacle up to 6\" (takes fall damage)." },
+  "Fortune": { tn: 8, strain: 0, type: "Self", desc: "Reroll any one d20 die roll made by the user during their activation." },
+  "Haggle": { tn: 10, strain: 0, type: "Out of Game (A)", desc: "Sell loot for +20 credits or buy equipment at a 10% discount post-game." },
+  "Heal": { tn: 8, strain: 0, type: "Touch / 6\"", desc: "Restore up to 5 lost Health to the user or a friendly figure within 6\"." },
+  "Holographic Wall": { tn: 10, strain: 0, type: "Line of Sight", desc: "Create a 6\" long holographic barrier that completely blocks line of sight for 1 turn." },
+  "Indifference": { tn: 10, strain: 0, type: "Self", desc: "Uncontrolled alien creatures and security robots ignore this figure unless attacked." },
+  "Information Broker": { tn: 10, strain: 0, type: "Out of Game (A)", desc: "Reroll scenario objective or gain +25 bonus credits from intelligence trade." },
+  "Inspiring": { tn: 8, strain: 0, type: "Area (6\")", desc: "All friendly models within 6\" receive +1 Will and +1 Fight against fear/morale." },
+  "Investments": { tn: 10, strain: 0, type: "Out of Game (A)", desc: "Generates 20-50 bonus credits after each completed campaign game." },
+  "Life Leach": { tn: 12, strain: 0, type: "Line of Sight", desc: "Make a +2 Shoot attack; restore Health to user equal to damage inflicted." },
+  "Lift": { tn: 10, strain: 0, type: "Line of Sight", desc: "Levitate self or a friendly model 6\" vertically or horizontally over obstacles." },
+  "Mystic Trance": { tn: 8, strain: 0, type: "Self", desc: "Gain +2 to the user's next power activation roll made during the game." },
+  "Pistol Expert": { tn: 8, strain: 0, type: "Self", desc: "User can fire a pistol twice in one activation or fire while in melee combat." },
+  "Power Spike": { tn: 8, strain: 1, type: "Self", desc: "Add +2 to a combat or shooting roll by pushing cybernetics or psychic focus." },
+  "Probability Curve": { tn: 10, strain: 0, type: "Line of Sight", desc: "Force an enemy to reroll a successful attack or defensive roll." },
+  "Psionic Fire": { tn: 12, strain: 1, type: "Line of Sight", desc: "+3 Shoot flaming psychic blast that ignores light cover." },
+  "Psychic Shield": { tn: 10, strain: 0, type: "Self", desc: "+2 Will against enemy powers and total immunity to mental control effects." },
+  "Pull": { tn: 10, strain: 0, type: "Line of Sight", desc: "Telekinetically pull a loot token or small item 6\" directly towards user." },
+  "Puppet Master": { tn: 14, strain: 2, type: "Line of Sight", desc: "Take control of an enemy model for 1 immediate action (opposed Will test)." },
+  "Quick-Step": { tn: 8, strain: 0, type: "Self", desc: "Immediately make a bonus 3\" move that ignores rough terrain and does not cost an action." },
+  "Quick Step": { tn: 8, strain: 0, type: "Self", desc: "Immediately make a bonus 3\" move that ignores rough terrain and does not cost an action." },
+  "Regenerate": { tn: 10, strain: 0, type: "Self", desc: "Regain 2 lost Health at the start of each activation for the rest of the game." },
+  "Remote Firing": { tn: 10, strain: 0, type: "Line of Sight", desc: "Fire an ally's ranged or heavy weapon from distance using their line of sight." },
+  "Remote Guidance": { tn: 8, strain: 0, type: "Line of Sight", desc: "Give +2 Shoot to a friendly model firing a ranged or heavy weapon." },
+  "Repair Robot": { tn: 8, strain: 0, type: "Touch / 6\"", desc: "Restore up to 5 lost Health to a robotic crew member." },
+  "Restructure Body": { tn: 10, strain: 1, type: "Self", desc: "Temporarily shift body mass: gain +1 Move, +1 Fight, or +1 Armour for game." },
+  "Re-wire Robot": { tn: 10, strain: 0, type: "Touch", desc: "Reprogram a disabled enemy robot to fight on your side for remainder of scenario." },
+  "Righteous Fury": { tn: 10, strain: 1, type: "Self", desc: "+2 Fight and +2 Damage on all melee attacks for this activation." },
+  "Saving Grace": { tn: 10, strain: 0, type: "Reaction", desc: "When reduced to 0 Health, survive with 1 Health instead once per game." },
+  "Seize the Initiative": { tn: 10, strain: 0, type: "Pre-turn", desc: "Reroll initiative or force opponent to reroll their initiative die." },
+  "Smash and Grab": { tn: 8, strain: 0, type: "Touch", desc: "Pick up a loot token with zero movement penalty on this turn." },
+  "Study Prey": { tn: 8, strain: 0, type: "Line of Sight", desc: "Designate a target: user gets +2 Shoot and +1 Damage against that specific foe." },
+  "Suggestion": { tn: 12, strain: 1, type: "Line of Sight", desc: "Compel an enemy to make a full standard move in a chosen direction." },
+  "Target Designation": { tn: 8, strain: 0, type: "Line of Sight", desc: "Paint a target: all friendly shooting attacks against that target gain +1 Shoot." },
+  "Target Lock": { tn: 8, strain: 0, type: "Line of Sight", desc: "Lock targeting computer: user's next shot at this target gets +3 Shoot." },
+  "Temporary Upgrade": { tn: 10, strain: 1, type: "Touch", desc: "Boost a friendly robot or cyborg with +2 Fight and +1 Armour for 1 full turn." },
+  "Thunderstrike": { tn: 12, strain: 1, type: "Area (3\")", desc: "Discharge kinetic pulse pushing back enemies within 3\" and knocking them prone." },
+  "Toxic Claws": { tn: 8, strain: 0, type: "Self", desc: "Melee attacks inflict +1 Damage and poison the target for ongoing damage." },
+  "Toxic Secretion": { tn: 8, strain: 0, type: "Area (3\")", desc: "Release a cloud of toxic fumes: blocks line of sight and poisons enemy figures." },
+  "Transport": { tn: 14, strain: 2, type: "Line of Sight", desc: "Teleport user or a friendly model up to 9\" to any visible, unoccupied location." },
+  "Treasure Seeker": { tn: 10, strain: 0, type: "Pre-game", desc: "Move one loot marker 3\" closer to your deployment zone before round 1 begins." },
+  "Void Blade": { tn: 10, strain: 1, type: "Self", desc: "Manifest a blade of pure void energy: counts as hand weapon with +2 Fight, +1 Damage." },
+  "Weapon Maintenance": { tn: 8, strain: 0, type: "Out of Game (B)", desc: "Clean and tune weapons: crew weapons ignore their first jam/malfunction roll." }
+};
+
+// Map each power to its core backgrounds
+const POWER_BG_MAP = {};
+BG.forEach(b => {
+  b.powers.forEach(p => {
+    if(!POWER_BG_MAP[p]) POWER_BG_MAP[p] = [];
+    if(!POWER_BG_MAP[p].includes(b.name)) POWER_BG_MAP[p].push(b.name);
+  });
+});
+
+// Helper for power timing categorization (Before Game / During Game / After Game)
+function getPowerTiming(pDataOrName){
+  let p = typeof pDataOrName === 'string' ? POWERS_DATA[pDataOrName] : pDataOrName;
+  if(!p || !p.type) return { key: "during", label: "During Game", short: "During", icon: "⚔️" };
+  const t = (p.type || "").toLowerCase();
+  if(t.includes("out of game (b)") || t.includes("pre-game")){
+    return { key: "before", label: "Before Game", short: "Before", icon: "⏳" };
+  }
+  if(t.includes("out of game (a)") || t.includes("post-game")){
+    return { key: "after", label: "After Game", short: "After", icon: "🏆" };
+  }
+  return { key: "during", label: "During Game", short: "During", icon: "⚔️" };
+}
+
+// Soldiers Catalog (Cost -1 = Free)
+const SOLDIERS = [
+  {n:"Recruit",t:"Standard",m:6,f:"+2",s:"+2",a:10,w:"+0",h:12,c:-1,note:"Pistol, Light Armour, Knife",b:"Core"},
+  {n:"Runner",t:"Standard",m:7,f:"+2",s:"+1",a:9,w:"+1",h:12,c:-1,note:"Pistol, Knife",b:"Core"},
+  {n:"Hacker",t:"Standard",m:6,f:"+1",s:"+1",a:10,w:"+1",h:12,c:20,note:"Pistol, Deck, Light Armour, Knife",b:"Core"},
+  {n:"Chiseler",t:"Standard",m:6,f:"+1",s:"+1",a:10,w:"+1",h:12,c:20,note:"Pistol, Picks, Light Armour, Knife",b:"Core"},
+  {n:"Guard Dog",t:"Standard",m:8,f:"+1",s:"+0",a:8,w:"-2",h:10,c:10,note:"Animal, cannot carry gear or loot tokens",b:"Core"},
+  {n:"Sentry",t:"Standard",m:5,f:"+3",s:"+2",a:11,w:"+0",h:14,c:50,note:"Carbine, Heavy Armour, Knife",b:"Core"},
+  {n:"Trooper",t:"Standard",m:5,f:"+2",s:"+3",a:11,w:"+0",h:14,c:50,note:"Carbine, Heavy Armour, Knife",b:"Core"},
+  {n:"Medic",t:"Standard",m:7,f:"+2",s:"+2",a:10,w:"+3",h:14,c:100,note:"Pistol, Light Armour, Medic Kit",b:"Core"},
+  {n:"Bruiser",t:"Standard",m:6,f:"+3",s:"+0",a:11,w:"+0",h:11,c:-1,note:"Hand Weapon, Knife, Heavy Armour, Hard to Target",b:"TLP"},
+  {n:"Engineer",t:"Standard",m:6,f:"+3",s:"+2",a:10,w:"+3",h:12,c:100,note:"Carbine, Hand Wpn, Light Armour, Ship Repair Discount",b:"TLP"},
+  {n:"Mule",t:"Standard",m:6,f:"+0",s:"+3",a:10,w:"+0",h:12,c:50,note:"Robot, Pistol, 4 gear slots, no loot penalty",b:"Q37"},
+  {n:"Q-bot",t:"Standard",m:6,f:"+1",s:"+1",a:10,w:"+0",h:12,c:50,note:"Robot, Deck/Pick, 1-shot launcher/flamer, Knife",b:"Q37"},
+  {n:"Ravaged",t:"Standard",m:6,f:"+1",s:"+1",a:10,w:"+1",h:14,c:-1,note:"Pistol, Light Armour, Knife, High Pain Threshold",b:"Q37"},
+  {n:"Ravaged Trooper",t:"Standard",m:5,f:"+1",s:"+2",a:11,w:"+1",h:16,c:50,note:"Carbine, Heavy Armour, Knife, High Pain Threshold",b:"Q37"},
+  {n:"Apprentice",t:"Standard",m:6,f:"+1",s:"+0",a:10,w:"+2",h:12,c:20,note:"Pistol, Light Armour, Knife, May cast/assist 1 Power",b:"BE"},
+  {n:"Comtech",t:"Standard",m:6,f:"+2",s:"+2",a:10,w:"+1",h:12,c:50,note:"Carbine, Light Armour, Knife, Comm-link",b:"BE"},
+  {n:"Codebreaker",t:"Specialist",m:6,f:"+3",s:"+2",a:10,w:"+2",h:14,c:75,note:"Carbine, Deck, Light Armour, Knife",b:"Core"},
+  {n:"Casecracker",t:"Specialist",m:6,f:"+3",s:"+2",a:10,w:"+2",h:14,c:75,note:"Carbine, Picks, Light Armour, Knife",b:"Core"},
+  {n:"Commando",t:"Specialist",m:5,f:"+3",s:"+3",a:11,w:"+1",h:14,c:75,note:"Carbine, Grenades, Heavy Armour, Hand Wpn",b:"Core"},
+  {n:"Pathfinder",t:"Specialist",m:7,f:"+3",s:"+3",a:10,w:"+2",h:14,c:100,note:"Carbine, Grenades, Light Armour, Hand Wpn",b:"Core"},
+  {n:"Sniper",t:"Specialist",m:6,f:"+3",s:"+4",a:10,w:"+3",h:14,c:100,note:"Carbine, Light Armour, Hand Wpn",b:"Core"},
+  {n:"Grenadier",t:"Specialist",m:5,f:"+3",s:"+3",a:11,w:"+2",h:14,c:100,note:"Grenade Launcher, Pistol, Heavy Armour, Knife",b:"Core"},
+  {n:"Burner",t:"Specialist",m:5,f:"+3",s:"+2",a:11,w:"+1",h:14,c:100,note:"Flamethrower, Pistol, Heavy Armour, Knife",b:"Core"},
+  {n:"Gunner",t:"Specialist",m:5,f:"+3",s:"+3",a:11,w:"+1",h:14,c:100,note:"Rapid-Fire, Pistol, Heavy Armour, Knife",b:"Core"},
+  {n:"Armoured Trooper",t:"Specialist",m:6,f:"+4",s:"+4",a:13,w:"+3",h:14,c:150,note:"Carbine, Combat Armour",b:"Core"},
+  {n:"Striker",t:"Specialist",m:7,f:"+5",s:"+1",a:10,w:"+3",h:14,c:100,note:"2× Hand Wpn, Knife, Light Armour, Two-Hand Fighter",b:"TLP"},
+  {n:"Terrain Expert",t:"Specialist",m:6,f:"+3",s:"+3",a:10,w:"+1",h:14,c:100,note:"Carbine, Knife, Light Armour, Expert Climber",b:"TLP"},
+  {n:"Gun Fighter",t:"Specialist",m:6,f:"+3",s:"+4",a:10,w:"+3",h:14,c:100,note:"Two Pistols, Light Armour, Knife, Two-Gun Fighter",b:"Q37"},
+  {n:"Trophy-taker",t:"Specialist",m:6,f:"+3",s:"+3",a:11,w:"+3",h:14,c:100,note:"Carbine, Light Armour, Hand Wpn, Beast Fighter",b:"Q37"},
+  {n:"Quartermaster",t:"Specialist",m:6,f:"+3",s:"+2",a:10,w:"+2",h:14,c:75,note:"Carbine, Light Armour, Hand Wpn, Knife, Resupply",b:"BE"},
+  {n:"Expert",t:"Specialist",m:6,f:"+3",s:"+3",a:10,w:"+3",h:14,c:100,note:"Carbine, Light Armour, Hand Wpn, Skill Mastery",b:"BE"},
+  {n:"Exosuit",t:"Specialist",m:5,f:"+4",s:"+4",a:13,w:"+2",h:15,c:150,note:"Heavy Carbine, Exosuit Power Armour, Heavy Weapons",b:"BE"}
+];
+
+// Comprehensive Items & Armoury Knowledge Base (47 Items across all categories)
+const ITEMS_DATA = [
+  // Creation Phase Weapons
+  { n:"Carbine", grp:"Weapons", c:15, slots:1, range:"24\"", dmg:"+0", avail:"creation",
+    note:"Standard long-arm service rifle. Reliable, versatile, standard-issue for Troopers and Commandos." },
+  { n:"Pistol", grp:"Weapons", c:10, slots:1, range:"10\"", dmg:"+0", avail:"creation",
+    note:"Standard sidearm. Compact and light. Can be fired in hand-to-hand combat by Pistol Experts without penalty." },
+  { n:"Shotgun", grp:"Weapons", c:20, slots:1, range:"12\"", dmg:"+1 (at <=12\")", avail:"creation",
+    note:"Devastating short-range ballistic scattergun. Deals +1 Damage on all targets within 12\"." },
+  { n:"Hand Weapon", grp:"Weapons", c:10, slots:1, range:"Melee", dmg:"+0", avail:"creation",
+    note:"Single-handed melee weapon (machete, vibro-knife, shock baton). Grants +0 Fight." },
+  { n:"Knife", grp:"Weapons", c:5, slots:1, range:"Melee", dmg:"+0", avail:"creation",
+    note:"Compact backup blade. Essential reserve weapon if disarmed or engaged in close quarters." },
+  { n:"Rapid-Fire", grp:"Weapons", c:35, slots:2, range:"24\"", dmg:"+0", avail:"creation",
+    note:"Heavy squad automatic weapon. Requires 2 gear slots. Provides +1 Shoot bonus on burst attacks or suppressive fire." },
+  { n:"Grenade Launcher", grp:"Weapons", c:30, slots:2, range:"16\"", dmg:"+2", avail:"creation",
+    note:"Fires explosive shells on an indirect trajectory. Requires 2 gear slots. Deals +2 area template damage." },
+  { n:"Flamethrower", grp:"Weapons", c:30, slots:2, range:"8\" Template", dmg:"+1 / Fire", avail:"creation",
+    note:"Ejects a continuous stream of burning liquid chemical. Targets caught under the template must test or catch fire." },
+  { n:"Grenades", grp:"Weapons", c:30, slots:1, range:"Thrown 8\"", dmg:"+2", avail:"creation",
+    note:"Thrown explosive canisters (consumable). Deals +2 Damage in a 2\" blast radius upon detonation." },
+
+  // Creation Phase Armour & Shields
+  { n:"Light Armour", grp:"Armour & Shields", c:10, slots:1, arm:"+1", move:"-0", avail:"creation",
+    note:"Flexible Kevlar/composite weave. Grants +1 Armour with zero movement penalty." },
+  { n:"Heavy Armour", grp:"Armour & Shields", c:30, slots:1, arm:"+2", move:"-1\"", avail:"creation",
+    note:"Rigid plate body armour. Grants +2 Armour, but imposes a -1\" Move penalty on the wearer." },
+  { n:"Combat Armour", grp:"Armour & Shields", c:50, slots:2, arm:"+3", move:"-1\"", avail:"creation",
+    note:"Heavy powered exoskeleton armor. Grants +3 Armour, -1\" Move penalty, and requires 2 gear slots." },
+  { n:"Shield", grp:"Armour & Shields", c:25, slots:1, arm:"+0", move:"-0", avail:"creation",
+    note:"Kinetic energy barrier buckler. Grants +1 Fight against all incoming shooting attacks (Paladin favorite)." },
+
+  // Creation Phase Field Equipment
+  { n:"Deck", grp:"Field Equipment", c:20, slots:1, avail:"creation",
+    note:"Handheld cybernetic hacking computer. Grants +2 on all attempts to unlock Data loot tokens." },
+  { n:"Picks", grp:"Field Equipment", c:20, slots:1, avail:"creation",
+    note:"Sonic lockpicks and plasma torch kit. Grants +2 on all attempts to unlock Physical loot containers." },
+  { n:"Medic Kit", grp:"Field Equipment", c:20, slots:1, avail:"creation",
+    note:"Field surgical kit & trauma drugs. Figure can spend 1 action to restore 5 Health to an adjacent friendly model." },
+  { n:"Filter Mask", grp:"Field Equipment", c:15, slots:1, avail:"creation",
+    note:"Sealed respirator system providing complete immunity to smoke, toxic gas, and aerosol spores." },
+  { n:"Combat Scanner", grp:"Field Equipment", c:30, slots:1, avail:"creation",
+    note:"Thermal/electromagnetic scanner. Allows line of sight to ignore optical camouflage and smoke within 12\"." },
+  { n:"Survey Drone", grp:"Field Equipment", c:40, slots:1, avail:"creation",
+    note:"Expedition scouting drone (Bold Endeavour). Reveals hidden tokens and scouts terrain up to 18\" away." },
+  { n:"Mining Charges", grp:"Field Equipment", c:35, slots:1, avail:"creation",
+    note:"Heavy shape charges (The Last Prospector). Destroys barricades, breaches bulkheads, and clears rubble." },
+  { n:"Sample Collector", grp:"Field Equipment", c:25, slots:1, avail:"creation",
+    note:"Bio-containment unit (Quarantine 37). Allows safe retrieval of contaminated samples without infection risk." },
+
+  // Creation Phase Starship Upgrades
+  { n:"Medical Bay", grp:"Starship Upgrades", c:100, slots:0, avail:"creation",
+    note:"Ship-board trauma unit. Allows 1 free reroll on survival and permanent injury checks post-game." },
+  { n:"Armoury", grp:"Starship Upgrades", c:100, slots:0, avail:"creation",
+    note:"Dedicated munitions storage. Waives upkeep costs for Combat Armour and allows stockpiling spare weapons." },
+  { n:"Workshop", grp:"Starship Upgrades", c:100, slots:0, avail:"creation",
+    note:"Automated fabrication bench. Provides a 50% discount on robot repairs and equipment modifications." },
+  { n:"Smuggling Compartments", grp:"Starship Upgrades", c:100, slots:0, avail:"creation",
+    note:"Lead-shielded hidden holds. Shields up to 100cr in loot/credits from pirate or customs confiscation." },
+  { n:"Escape Pods", grp:"Starship Upgrades", c:100, slots:0, avail:"creation",
+    note:"High-speed ejection pods. Protects crew from permanent death results during catastrophic defeats." },
+  { n:"Targeting Array", grp:"Starship Upgrades", c:200, slots:0, avail:"creation",
+    note:"Orbital sensor suite. Grants your crew +1 to Table Initiative on turn 1 of every scenario." },
+  { n:"Luxury Cabins", grp:"Starship Upgrades", c:150, slots:0, avail:"creation",
+    note:"High-amenity quarters. Improves crew morale and unlocks 1 additional specialist soldier hiring slot." },
+  { n:"Decontamination Suite", grp:"Starship Upgrades", c:120, slots:0, avail:"creation",
+    note:"Contagion scrub bay (Quarantine 37). Automatically cures crew infections and parasites between games." },
+  { n:"Science Lab", grp:"Starship Upgrades", c:150, slots:0, avail:"creation",
+    note:"Deep-space research lab (Bold Endeavour). Yields bonus credits and research rolls from alien specimens." },
+  { n:"Mining Rig", grp:"Starship Upgrades", c:120, slots:0, avail:"creation",
+    note:"Asteroid mining rig (The Last Prospector). Adds +20 to post-game asteroid prospecting and mineral rolls." },
+  { n:"Reinforced Hull", grp:"Starship Upgrades", c:150, slots:0, avail:"creation",
+    note:"Reinforced bulkhead shielding (Bold Endeavour). Protects ship from deep space travel hazards and anomalies." },
+  { n:"Hydroponics Bay", grp:"Starship Upgrades", c:100, slots:0, avail:"creation",
+    note:"Long-range sustained expedition ecosystem (Bold Endeavour). Reduces crew maintenance and upkeep costs." },
+  { n:"Ship Upgrade (Minor)", grp:"Starship Upgrades", c:100, slots:0, avail:"creation",
+    note:"Generic minor ship improvement customized to your crew's narrative (e.g. improved comms)." },
+  { n:"Ship Upgrade (Major)", grp:"Starship Upgrades", c:200, slots:0, avail:"creation",
+    note:"Generic major ship overhaul (e.g. high-output reactor, military stealth plating, hyper-drives)." },
+
+  // Advanced Technology & Campaign Loot Weapons
+  { n:"Heavy Carbine", grp:"Weapons", c:120, slots:1, range:"24\"", dmg:"+1", avail:"loot",
+    note:"Advanced military assault rifle. Superior stopping power (+1 Damage) with standard rifle range." },
+  { n:"Plasma Pistol", grp:"Weapons", c:140, slots:1, range:"12\"", dmg:"+2", avail:"loot",
+    note:"Superheated plasma sidearm. Deals +2 Damage; ignores the first point of target armor." },
+  { n:"Plasma Rifle", grp:"Weapons", c:160, slots:2, range:"24\"", dmg:"+2", avail:"loot",
+    note:"High-energy military plasma weapon. Deals +2 Damage and reduces target's effective Armour by 1." },
+  { n:"Sniper Rifle", grp:"Weapons", c:150, slots:2, range:"36\"", dmg:"+2", avail:"loot",
+    note:"Long-range high-velocity marksman rifle. Ignores light cover and deals +2 Damage at extreme range." },
+  { n:"Sonic Rifle", grp:"Weapons", c:130, slots:2, range:"18\"", dmg:"+0", avail:"loot",
+    note:"Disruptive soundwave cannon. Ignores non-energy physical armor and automatically Stuns target on hit." },
+  { n:"Mining Laser", grp:"Weapons", c:50, slots:2, range:"12\"", dmg:"+2", avail:"loot",
+    note:"Heavy cutting beam (The Last Prospector). Deals +2 Damage against heavily armoured targets or robots." },
+  { n:"Flechette Pistol", grp:"Weapons", c:45, slots:1, range:"10\"", dmg:"+1", avail:"loot",
+    note:"Anti-infantry shredder (Quarantine 37). Fires razor shards with +1 Damage against unarmoured targets." },
+  { n:"Needle Rifle", grp:"Weapons", c:110, slots:2, range:"24\"", dmg:"+0 / Toxic", avail:"loot",
+    note:"Silent pressurized dart rifle (Quarantine 37). Target suffers immediate Poison condition upon taking damage." },
+  { n:"Power Weapon", grp:"Weapons", c:120, slots:1, range:"Melee", dmg:"+1", avail:"loot",
+    note:"Energized melee blade/axe. Grants +2 Fight and +1 Damage in close combat." },
+  { n:"Arc Rifle", grp:"Weapons", c:135, slots:2, range:"20\"", dmg:"+1", avail:"loot",
+    note:"High-voltage electrical rifle. Electrical current arcs to deal 2 damage to any enemy within 2\" of the primary target." },
+
+  // Advanced Technology Armour & Defense
+  { n:"Stealth Suit", grp:"Armour & Shields", c:200, slots:1, arm:"+1", move:"-0", avail:"loot",
+    note:"Active adaptive camouflage suit. Provides +1 Armour and permanent Camouflage beyond 12\"." },
+  { n:"Ablative Armour Plates", grp:"Armour & Shields", c:80, slots:0, avail:"loot",
+    note:"One-use sacrificial ceramic plating. Automatically negates the first critical hit suffered each game." },
+  { n:"Reactive Armour", grp:"Armour & Shields", c:150, slots:1, arm:"+2", move:"-0", avail:"loot",
+    note:"Advanced micro-explosive reactive plates. Grants +2 Armour with NO Move penalty." },
+  { n:"Force Field Belt", grp:"Armour & Shields", c:220, slots:1, avail:"loot",
+    note:"Personal kinetic energy shield. Absorbs the first 5 damage points taken during each mission." },
+
+  // Advanced Technology Equipment & Implants
+  { n:"Advanced Deck", grp:"Field Equipment", c:80, slots:1, avail:"loot",
+    note:"Military-spec cyberdeck. Grants +4 on Data loot unlock rolls and allows hacking from up to 4\" away." },
+  { n:"Advanced Picks", grp:"Field Equipment", c:80, slots:1, avail:"loot",
+    note:"Molecular resonator lockpicks. Grants +4 on Physical loot unlock rolls and never jams on fail." },
+  { n:"Bionic Eye", grp:"Field Equipment", c:150, slots:0, avail:"loot",
+    note:"Cybernetic optical implant. Grants a permanent +1 Shoot modifier to the implanted model." },
+  { n:"Bionic Arm", grp:"Field Equipment", c:150, slots:0, avail:"loot",
+    note:"Reinforced cybernetic arm. Grants permanent +1 Fight and +1 Damage on all melee strikes." },
+  { n:"Nanite Repair Canister", grp:"Field Equipment", c:100, slots:1, avail:"loot",
+    note:"Self-replicating repair swarm (Death Vector). Restores 6 Health to any robotic or cyborg crew model." },
+  { n:"Combat Stimms", grp:"Field Equipment", c:40, slots:1, avail:"loot",
+    note:"Consumable drug auto-injector. Grants +2 Move and +2 Fight for 2 consecutive turns, then 2 damage." },
+  { n:"Jump Booster", grp:"Field Equipment", c:120, slots:1, avail:"loot",
+    note:"Rocket-assisted mobility pack. Once per game make an immediate 12\" jump ignoring intervening terrain." },
+  { n:"Holographic Decoy", grp:"Field Equipment", c:90, slots:1, avail:"loot",
+    note:"Projector creating an identical hard-light duplicate. Enemies must pass a Will test to shoot the real figure." },
+
+  // Alien Artifacts & Relics
+  { n:"Alien Power Cell", grp:"Alien Artifacts", c:250, slots:0, avail:"artifact",
+    note:"Infinite zero-point energy battery. Can be sold for 250cr or installed on ship to generate +100cr post-game." },
+  { n:"Void Stone", grp:"Alien Artifacts", c:300, slots:1, avail:"artifact",
+    note:"Phase-locked alien mineral. User can activate any 1 power during the game without spending an action or strain." },
+  { n:"Phase Shifter", grp:"Alien Artifacts", c:280, slots:1, avail:"artifact",
+    note:"Ancient quantum cloak. Once per game, model can move through solid walls and impassable obstacles for 1 move." },
+  { n:"Precursor Phase Cloak", grp:"Alien Artifacts", c:320, slots:1, avail:"artifact",
+    note:"Ancient field modulator (Bold Endeavour). Bearer can pass through walls and ignores all line of sight for 1 turn." },
+  { n:"Dark Matter Canister", grp:"Alien Artifacts", c:380, slots:1, avail:"artifact",
+    note:"Gravitational anomaly cylinder (Bold Endeavour). Detonates as an area-of-effect implosion drawing all models toward center." },
+  { n:"Kinetic Dampener", grp:"Alien Artifacts", c:260, slots:1, avail:"artifact",
+    note:"Alien graviton emitter. Halves all damage taken from shooting attacks and physical explosions." },
+  { n:"Temporal Anchor", grp:"Alien Artifacts", c:350, slots:1, avail:"artifact",
+    note:"Time-loop relic. When reduced to 0 Health, model returns to life in deployment zone with 5 Health." },
+  { n:"Ancient Data Core", grp:"Alien Artifacts", c:400, slots:1, avail:"artifact",
+    note:"Inscrutable precursor archive. Grants permanent +1 to all crew research, trade, and exploration rolls." }
+];
+
+// In the builder, GEAR is populated from creation-phase ITEMS_DATA
+const GEAR = ITEMS_DATA.filter(i => i.avail === 'creation');
+
+/* ===================== STATE ===================== */
+const state = {
+  meta: { crewName:"", shipName:"", notes:"" },
+  houseRules: { maxTwoDuplicateSpecialists: false },
+  cap: null,
+  capName: "",
+  capPw: new Set(),
+  capStatChoices: {},
+  fm: null,
+  fmName: "",
+  fmPw: new Set(),
+  fmStatChoices: {},
+  crew: [],
+  gear: {},
+  aristoFreeUpgrade: ""
+};
+
+/* Base Human Starting Stat-line */
+const BASE_STATS = { m:6, f:2, s:2, a:9, w:2, h:14 };
+
+/* ===================== LOCAL STORAGE ===================== */
+const STORAGE_KEY = "stargrave_crew_builder_data_v2";
+
+function saveToLocalStorage(){
+  try{
+    const payload = {
+      meta: state.meta,
+      houseRules: state.houseRules,
+      cap: state.cap,
+      capName: state.capName,
+      capPw: Array.from(state.capPw),
+      capStatChoices: state.capStatChoices,
+      fm: state.fm,
+      fmName: state.fmName,
+      fmPw: Array.from(state.fmPw),
+      fmStatChoices: state.fmStatChoices,
+      crew: state.crew,
+      gear: state.gear,
+      aristoFreeUpgrade: state.aristoFreeUpgrade
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    const lbl = document.getElementById('autoSaveLabel');
+    if(lbl){ lbl.textContent = "Saved"; setTimeout(()=>{ lbl.textContent="Auto-saved"; },1500); }
+  }catch(e){ console.error(e); }
+}
+
+function loadFromLocalStorage(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(d){
+      state.meta = d.meta || { crewName:"", shipName:"", notes:"" };
+      state.houseRules = d.houseRules || { maxTwoDuplicateSpecialists: false };
+      state.cap = d.cap || null;
+      state.capName = d.capName || "";
+      state.capPw = new Set(d.capPw || []);
+      state.capStatChoices = d.capStatChoices || {};
+      state.fm = d.fm || null;
+      state.fmName = d.fmName || "";
+      state.fmPw = new Set(d.fmPw || []);
+      state.fmStatChoices = d.fmStatChoices || {};
+      state.crew = d.crew || [];
+      state.gear = d.gear || {};
+      state.aristoFreeUpgrade = d.aristoFreeUpgrade || "";
+      return true;
+    }
+  }catch(e){ console.error(e); }
+  return false;
+}
+
+/* ===================== TABS & NAVIGATION ===================== */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick = () => {
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    const targetView = document.getElementById('view-' + t.dataset.v);
+    if(targetView) targetView.classList.add('active');
+    document.getElementById('budgetbar').style.display = t.dataset.v === 'build' ? 'block' : 'none';
+
+    if(t.dataset.v === 'powers-kb') renderPowersKB();
+    if(t.dataset.v === 'items-kb') renderItemsKB();
+    if(t.dataset.v === 'ref') renderRefCodex();
+  };
+});
+
+/* Ref Subtabs */
+document.querySelectorAll('.ref-subtab').forEach(st=>{
+  st.onclick = () => {
+    document.querySelectorAll('.ref-subtab').forEach(x=>x.classList.remove('active'));
+    st.classList.add('active');
+    const target = st.dataset.rt;
+    document.getElementById('ref-sub-bg').style.display = target==='bg'?'block':'none';
+    document.getElementById('ref-sub-soldiers').style.display = target==='soldiers'?'block':'none';
+  };
+});
+
+/* ===================== METADATA SYNC ===================== */
+const crewNameInput = document.getElementById('crewName');
+const shipNameInput = document.getElementById('shipName');
+const campaignNotesInput = document.getElementById('campaignNotes');
+const capNameInput = document.getElementById('capName');
+const fmNameInput = document.getElementById('fmName');
+
+crewNameInput.oninput = e => { state.meta.crewName = e.target.value; syncPrintHeader(); saveToLocalStorage(); };
+shipNameInput.oninput = e => { state.meta.shipName = e.target.value; syncPrintHeader(); saveToLocalStorage(); };
+campaignNotesInput.oninput = e => { state.meta.notes = e.target.value; saveToLocalStorage(); };
+capNameInput.oninput = e => { state.capName = e.target.value; saveToLocalStorage(); };
+fmNameInput.oninput = e => { state.fmName = e.target.value; saveToLocalStorage(); };
+
+function syncPrintHeader(){
+  const cn = state.meta.crewName.trim() || "Unnamed Crew";
+  const sn = state.meta.shipName.trim() || "Unnamed Vessel";
+  const hr = state.houseRules?.maxTwoDuplicateSpecialists ? " · [House Rule: Max 2 Specialists of same type]" : "";
+  document.getElementById('printMetaLine').textContent = `Crew: ${cn} · Ship: ${sn}${hr}`;
+}
+
+/* ===================== STAT CALCULATOR ===================== */
+function calculateStats(which){
+  const bgName = which === 'cap' ? state.cap : state.fm;
+  if(!bgName) return null;
+  const bg = BG.find(x => x.name === bgName);
+  if(!bg) return null;
+
+  // Base human stats: +1 Armour for standard starting Light Armour
+  const res = { m: BASE_STATS.m, f: BASE_STATS.f, s: BASE_STATS.s, a: BASE_STATS.a + 1, w: BASE_STATS.w, h: BASE_STATS.h };
+
+  // Fixed background bonus
+  if(bg.fixed){
+    if(bg.fixed.m) res.m += bg.fixed.m;
+    if(bg.fixed.f) res.f += bg.fixed.f;
+    if(bg.fixed.s) res.s += bg.fixed.s;
+    if(bg.fixed.a) res.a += bg.fixed.a;
+    if(bg.fixed.w) res.w += bg.fixed.w;
+    if(bg.fixed.h) res.h += bg.fixed.h;
+  }
+
+  // User chosen stat bumps
+  const chosenMap = which === 'cap' ? state.capStatChoices : state.fmStatChoices;
+  if(bg.choices){
+    bg.choices.forEach(ch => {
+      const selectedIndices = chosenMap[ch.id] || [];
+      selectedIndices.forEach(idx => {
+        const opt = ch.opts[idx];
+        if(opt && opt.m){
+          if(opt.m.m) res.m += opt.m.m;
+          if(opt.m.f) res.f += opt.m.f;
+          if(opt.m.s) res.s += opt.m.s;
+          if(opt.m.a) res.a += opt.m.a;
+          if(opt.m.w) res.w += opt.m.w;
+          if(opt.m.h) res.h += opt.m.h;
+        }
+      });
+    });
+  }
+
+  return res;
+}
+
+function renderLeaderStats(which){
+  const card = document.getElementById(which === 'cap' ? 'capStatCard' : 'fmStatCard');
+  const grid = document.getElementById(which === 'cap' ? 'capStatGrid' : 'fmStatGrid');
+  const choicesEl = document.getElementById(which === 'cap' ? 'capStatChoices' : 'fmStatChoices');
+  const bgName = which === 'cap' ? state.cap : state.fm;
+
+  if(!bgName){ card.style.display="none"; return; }
+  card.style.display = "flex";
+
+  const stats = calculateStats(which);
+  const bg = BG.find(x => x.name === bgName);
+
+  // Render stat boxes
+  grid.innerHTML = `
+    <div class="stat-box"><div class="lbl">Move</div><div class="val ${stats.m !== BASE_STATS.m ? 'modified':''}">${stats.m}"</div></div>
+    <div class="stat-box"><div class="lbl">Fight</div><div class="val ${stats.f !== BASE_STATS.f ? 'modified':''}">+${stats.f}</div></div>
+    <div class="stat-box"><div class="lbl">Shoot</div><div class="val ${stats.s !== BASE_STATS.s ? 'modified':''}">+${stats.s}</div></div>
+    <div class="stat-box"><div class="lbl">Armour</div><div class="val modified">${stats.a}</div></div>
+    <div class="stat-box"><div class="lbl">Will</div><div class="val ${stats.w !== BASE_STATS.w ? 'modified':''}">+${stats.w}</div></div>
+    <div class="stat-box"><div class="lbl">Health</div><div class="val ${stats.h !== BASE_STATS.h ? 'modified':''}">${stats.h}</div></div>
+  `;
+
+  // Print damage track and background name
+  const trackId = which + '_printTrack';
+  let trackEl = card.querySelector('#' + trackId);
+  if(!trackEl){
+    trackEl = document.createElement('div');
+    trackEl.id = trackId;
+    trackEl.className = "print-only print-track";
+    card.appendChild(trackEl);
+  }
+  trackEl.innerHTML = `<b>Health Damage Track (${stats.h}):</b> ` + Array.from({length:stats.h}).map(()=>'<span class="track-box"></span>').join("");
+
+  const bgPrintId = which + '_printBg';
+  let bgPrintEl = document.getElementById(bgPrintId);
+  if(!bgPrintEl){
+    bgPrintEl = document.createElement('div');
+    bgPrintEl.id = bgPrintId;
+    bgPrintEl.className = "print-only";
+    bgPrintEl.style.fontWeight = "bold";
+    bgPrintEl.style.margin = "4px 0";
+    const slot = card.closest('.slot');
+    if(slot) slot.insertBefore(bgPrintEl, card);
+  }
+  bgPrintEl.textContent = `Background: ${bg.name} (${SRC[bg.src].label})`;
+
+  // Render choices
+  if(!bg.choices || !bg.choices.length){
+    choicesEl.style.display = "none";
+    return;
+  }
+
+  choicesEl.style.display = "block";
+  const chosenMap = which === 'cap' ? state.capStatChoices : state.fmStatChoices;
+
+  choicesEl.innerHTML = bg.choices.map(ch => {
+    const sel = chosenMap[ch.id] || [];
+    return `
+      <div style="margin-bottom:8px">
+        <div class="stat-choices-lbl">${ch.label} (pick ${ch.max})</div>
+        <div class="choice-btns">
+          ${ch.opts.map((opt, idx) => {
+            const isSel = sel.includes(idx);
+            return `<button class="choice-btn ${isSel ? 'sel':''}" data-which="${which}" data-chid="${ch.id}" data-idx="${idx}">${opt.lbl}</button>`;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  choicesEl.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.onclick = () => {
+      const w = btn.dataset.which;
+      const chId = btn.dataset.chid;
+      const idx = +btn.dataset.idx;
+      const map = w === 'cap' ? state.capStatChoices : state.fmStatChoices;
+      const ch = bg.choices.find(c => c.id === chId);
+      let arr = map[chId] ? [...map[chId]] : [];
+
+      if(arr.includes(idx)){
+        arr = arr.filter(i => i !== idx);
+      } else {
+        if(arr.length >= ch.max){
+          if(ch.max === 1) arr = [idx];
+          else return;
+        } else {
+          arr.push(idx);
+        }
+      }
+      map[chId] = arr;
+      renderLeaderStats(w);
+      recalc();
+      saveToLocalStorage();
+    };
+  });
+
+  // Render synergy guide drawer
+  const synId = which + '_synDrawer';
+  let synEl = card.querySelector('#' + synId);
+  if(bg.synergies){
+    if(!synEl){
+      synEl = document.createElement('details');
+      synEl.id = synId;
+      synEl.className = "bg-synergy-drawer no-print";
+      card.appendChild(synEl);
+    }
+    synEl.innerHTML = `
+      <summary style="cursor:pointer;color:var(--accent);font-weight:700;display:flex;align-items:center;gap:6px;margin-top:6px;user-select:none">
+        <span>💡 ${bg.name} Guide &amp; Synergies</span>
+        <span style="font-size:10.5px;color:var(--muted);font-weight:normal">(click to expand)</span>
+      </summary>
+      <div style="margin-top:8px;padding:9px 12px;background:#060b14;border:1px solid var(--line);border-radius:8px;line-height:1.45;display:flex;flex-direction:column;gap:5px;font-size:11.5px">
+        <div style="color:var(--ink)"><b>Tactical Role:</b> ${bg.role}</div>
+        <div><b style="color:var(--accent)">Best Pairings:</b> ${bg.synergies.firstMate}</div>
+        <div><b style="color:var(--gold)">Crew Synergies:</b> ${bg.synergies.crew}</div>
+        <div><b style="color:var(--good)">Key Combos:</b> ${bg.synergies.combos}</div>
+      </div>
+    `;
+  } else if(synEl){
+    synEl.remove();
+  }
+}
+
+/* ===================== POWERS PICKER ===================== */
+const capSel = document.getElementById('capSel');
+const fmSel = document.getElementById('fmSel');
+
+BG.forEach(b => { capSel.add(new Option(`${b.name} — ${SRC[b.src].label}`, b.name)); });
+BG.filter(b => !b.cap).forEach(b => { fmSel.add(new Option(`${b.name} — ${SRC[b.src].label}`, b.name)); });
+
+function renderPwPick(which){
+  const bgName = which === 'cap' ? state.cap : state.fm;
+  const el = document.getElementById(which === 'cap' ? 'capPw' : 'fmPw');
+  if(!bgName){ el.innerHTML = ""; return; }
+
+  const b = BG.find(x => x.name === bgName);
+  const limit = which === 'cap' ? 6 : 4;
+  const sel = which === 'cap' ? state.capPw : state.fmPw;
+  const full = sel.size >= limit;
+
+  el.innerHTML = `
+    <div class="hd">
+      <span>Choose <b>${limit}</b> Powers</span>
+      <span class="cnt ${sel.size === limit ? 'full' : ''} ${sel.size > limit ? 'over' : ''}">${sel.size} / ${limit}</span>
+    </div>
+    <div class="pwlist">
+      ${b.powers.map(p => {
+        const on = sel.has(p);
+        const dis = !on && full;
+        const pData = POWERS_DATA[p] || { tn: 10, strain: 0, type: "Action", desc: "" };
+        const displayTN = which === 'fm' ? pData.tn + 2 : pData.tn;
+        const timing = getPowerTiming(pData);
+        return `
+          <div class="pwopt ${on ? 'sel' : ''} ${dis ? 'disabled' : ''}" data-which="${which}" data-pw="${p}">
+            <span>${p}</span>
+            <span class="timing-chip timing-${timing.key}" title="${timing.label} Power">${timing.icon} ${timing.label}</span>
+            <span class="tn" title="Activation Target Number">TN ${displayTN}</span>
+            <span class="info-icon" title="View power rules summary" data-info="${p}">ℹ️</span>
+          </div>
+        `;
+      }).join("")}
+    </div>
+    ${b.special ? `<div class="special-box"><div class="lbl">Background Trait &amp; Rules</div>${b.special}</div>` : ''}
+  `;
+
+  // Click to toggle power
+  el.querySelectorAll('.pwopt').forEach(opt => {
+    opt.onclick = (e) => {
+      if(e.target.classList.contains('info-icon')) return;
+      const p = opt.dataset.pw;
+      if(sel.has(p)) sel.delete(p);
+      else {
+        if(sel.size >= limit) return;
+        sel.add(p);
+      }
+      renderPwPick(which);
+      recalc();
+      saveToLocalStorage();
+    };
+  });
+
+  // Click info icon for modal
+  el.querySelectorAll('.info-icon').forEach(icon => {
+    icon.onclick = (e) => {
+      e.stopPropagation();
+      showPowerModal(icon.dataset.info, which === 'fm');
+    };
+  });
+}
+
+capSel.onchange = () => {
+  state.cap = capSel.value || null;
+  state.capPw.clear();
+  state.capStatChoices = {};
+  renderLeaderStats('cap');
+  renderPwPick('cap');
+  recalc();
+  saveToLocalStorage();
+};
+
+fmSel.onchange = () => {
+  state.fm = fmSel.value || null;
+  state.fmPw.clear();
+  state.fmStatChoices = {};
+  renderLeaderStats('fm');
+  renderPwPick('fm');
+  recalc();
+  saveToLocalStorage();
+};
+
+/* ===================== SOLDIERS CATALOG & ROSTER ===================== */
+let soldierFilter = "all";
+let soldierBookFilter = "all";
+let soldierQuery = "";
+
+const stBody = document.querySelector('#soldierTable tbody');
+
+function renderSoldierCatalog(){
+  stBody.innerHTML = "";
+  const specialistCount = state.crew.filter(s => s.t === "Specialist").length;
+  const isSpecialistCapped = specialistCount >= 4;
+  const isCrewCapped = state.crew.length >= 8;
+  const isRuleMax2 = !!(state.houseRules && state.houseRules.maxTwoDuplicateSpecialists);
+
+  SOLDIERS.forEach((sld, i) => {
+    const matchClass = soldierFilter === "all" || sld.t === soldierFilter;
+    const matchBook = soldierBookFilter === "all" || sld.b === soldierBookFilter;
+    const matchQ = !soldierQuery || (sld.n + " " + sld.note + " " + sld.t).toLowerCase().includes(soldierQuery);
+
+    if(!matchClass || !matchBook || !matchQ) return;
+
+    const tr = document.createElement('tr');
+    const costHtml = sld.c < 0 ? '<span class="free" style="color:var(--good);font-weight:700">Free</span>' : `<span class="cost" style="color:var(--gold);font-weight:700">${sld.c}cr</span>`;
+    const isSpec = sld.t === "Specialist";
+    const countOfThisType = state.crew.filter(s => s.n === sld.n).length;
+    const isHouseRuleMaxTwoViolated = isRuleMax2 && isSpec && countOfThisType >= 2;
+    const disabled = isCrewCapped || (isSpec && isSpecialistCapped) || isHouseRuleMaxTwoViolated;
+
+    let titleMsg = "+ Add to crew";
+    if(isCrewCapped) titleMsg = "Crew roster is full (max 8)";
+    else if(isSpec && isSpecialistCapped) titleMsg = "Specialist limit reached (max 4 specialists)";
+    else if(isHouseRuleMaxTwoViolated) titleMsg = `House Rule: Maximum 2 ${sld.n}s allowed per crew`;
+
+    let badgeHtml = "";
+    if(isSpec && isRuleMax2 && countOfThisType > 0){
+      const isCapped = countOfThisType >= 2;
+      badgeHtml = `<span style="margin-left:6px;font-size:10px;padding:1px 6px;border-radius:4px;font-weight:700;${isCapped ? 'background:rgba(255,95,107,0.18);color:var(--bad);border:1px solid rgba(255,95,107,0.4)' : 'background:rgba(255,207,92,0.15);color:var(--gold);border:1px solid rgba(255,207,92,0.4)'}" title="${countOfThisType}/2 recruited">${countOfThisType}/2</span>`;
+    }
+
+    tr.innerHTML = `
+      <td><b>${sld.n}</b>${badgeHtml}<div style="font-size:11px;color:var(--muted)">${sld.note}</div></td>
+      <td><span class="type-tag ${sld.t.toLowerCase()}">${sld.t}</span></td>
+      <td>${sld.m}</td><td>${sld.f}</td><td>${sld.s}</td><td>${sld.a}</td><td>${sld.w}</td><td>${sld.h}</td>
+      <td>${costHtml}</td>
+      <td><span class="srcbook">${sld.b}</span></td>
+      <td style="text-align:right">
+        <button class="add-btn" data-i="${i}" ${disabled ? 'disabled' : ''} title="${titleMsg}">${isHouseRuleMaxTwoViolated ? 'Max 2' : '+ Add'}</button>
+      </td>
+    `;
+    stBody.appendChild(tr);
+  });
+
+  stBody.querySelectorAll('.add-btn').forEach(btn => {
+    btn.onclick = () => {
+      const idx = +btn.dataset.i;
+      const sld = SOLDIERS[idx];
+      const currentSpec = state.crew.filter(s => s.t === "Specialist").length;
+      if(state.crew.length >= 8) return;
+      if(sld.t === "Specialist" && currentSpec >= 4) return;
+      if(sld.t === "Specialist" && isRuleMax2){
+        const countOfThisType = state.crew.filter(s => s.n === sld.n).length;
+        if(countOfThisType >= 2) return;
+      }
+
+      state.crew.push({
+        id: "c_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4),
+        refIndex: idx,
+        customName: sld.n,
+        ...sld
+      });
+      renderRoster();
+      renderSoldierCatalog();
+      recalc();
+      saveToLocalStorage();
+    };
+  });
+}
+
+// Roster rendering with custom names and full stats
+function renderRoster(){
+  const r = document.getElementById('roster');
+  if(!state.crew.length){
+    r.innerHTML = '<div class="empty">No crew recruited yet. Browse the recruitment roster below to recruit up to 8 soldiers.</div>';
+  } else {
+    r.innerHTML = state.crew.map((s, idx) => {
+      const costHtml = s.c < 0 ? '<span class="free" style="color:var(--good);font-weight:700">Free</span>' : `<span class="cost" style="color:var(--gold);font-weight:700">${s.c}cr</span>`;
+      return `
+        <div class="ritem" data-id="${s.id}">
+          <div class="num">#${idx + 1}</div>
+          <div class="info">
+            <div class="name-row">
+              <input type="text" class="custom-name" value="${escapeHtml(s.customName || s.n)}" data-idx="${idx}" placeholder="Soldier Name">
+              <span class="type-tag ${s.t.toLowerCase()}">${s.t}</span>
+              <span class="srcbook">${s.b}</span>
+            </div>
+            <div class="stats-mini">
+              <span>M</span>${s.m}" <span>F</span>${s.f} <span>S</span>${s.s} <span>A</span>${s.a} <span>W</span>${s.w} <span>H</span>${s.h}
+            </div>
+            <div class="gear-notes"><b>Gear:</b> ${s.note}</div>
+            <div class="print-only print-track">
+              Health (${s.h}): ${Array.from({length:s.h}).map(()=>'<span class="track-box"></span>').join("")}
+            </div>
+          </div>
+          <div class="cost-box">${costHtml}</div>
+          <div class="actions no-print">
+            <button class="icon-btn" title="Move Up" data-act="up" data-idx="${idx}" ${idx===0?'disabled':''}>&uarr;</button>
+            <button class="icon-btn" title="Move Down" data-act="down" data-idx="${idx}" ${idx===state.crew.length-1?'disabled':''}>&darr;</button>
+            <button class="icon-btn rm" title="Remove from crew" data-act="rm" data-idx="${idx}">&times;</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // Custom name editing
+    r.querySelectorAll('.custom-name').forEach(inp => {
+      inp.onchange = e => {
+        const idx = +e.target.dataset.idx;
+        if(state.crew[idx]){
+          state.crew[idx].customName = e.target.value.trim() || state.crew[idx].n;
+          saveToLocalStorage();
+        }
+      };
+    });
+
+    // Action buttons
+    r.querySelectorAll('.icon-btn').forEach(btn => {
+      btn.onclick = () => {
+        const act = btn.dataset.act;
+        const idx = +btn.dataset.idx;
+        if(act === 'rm'){
+          state.crew.splice(idx, 1);
+        } else if(act === 'up' && idx > 0){
+          const temp = state.crew[idx];
+          state.crew[idx] = state.crew[idx - 1];
+          state.crew[idx - 1] = temp;
+        } else if(act === 'down' && idx < state.crew.length - 1){
+          const temp = state.crew[idx];
+          state.crew[idx] = state.crew[idx + 1];
+          state.crew[idx + 1] = temp;
+        }
+        renderRoster();
+        renderSoldierCatalog();
+        recalc();
+        saveToLocalStorage();
+      };
+    });
+  }
+
+  // Update pills
+  const specCount = state.crew.filter(s => s.t === "Specialist").length;
+  const specPill = document.getElementById('specCountPill');
+  specPill.textContent = `${specCount} / 4 Specialists Max`;
+  specPill.className = "pill " + (specCount === 4 ? "ok" : specCount > 4 ? "bad" : "");
+
+  const crewPill = document.getElementById('crewCountPill');
+  crewPill.textContent = `${state.crew.length} / 8 Crew`;
+  crewPill.className = "pill " + (state.crew.length === 8 ? "ok" : state.crew.length > 8 ? "bad" : "");
+}
+
+// Catalog filter controls
+document.querySelectorAll('.filter-group .filter-btn').forEach(btn => {
+  btn.onclick = () => {
+    if(btn.dataset.sf !== undefined){
+      document.querySelectorAll('.filter-group .filter-btn[data-sf]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      soldierFilter = btn.dataset.sf;
+    }
+    if(btn.dataset.sb !== undefined){
+      document.querySelectorAll('.filter-group .filter-btn[data-sb]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      soldierBookFilter = btn.dataset.sb;
+    }
+    renderSoldierCatalog();
+  };
+});
+
+document.getElementById('soldierSearch').oninput = e => {
+  soldierQuery = e.target.value.trim().toLowerCase();
+  renderSoldierCatalog();
+};
+
+/* ===================== GEAR & SHIP UPGRADES ===================== */
+const gearSections = document.getElementById('gearSections');
+const gearSpentPill = document.getElementById('gearSpentPill');
+const aristoFreeSelect = document.getElementById('aristoFreeUpgrade');
+
+function renderGearCatalog(){
+  const groups = [...new Set(GEAR.map(g => g.grp))];
+  gearSections.innerHTML = groups.map(grp => `
+    <div class="gear-col">
+      <div class="gear-col-title">${grp}</div>
+      ${GEAR.filter(g => g.grp === grp).map(g => {
+        const id = "g_" + g.n.replace(/[^a-z0-9]/gi, '');
+        const q = state.gear[g.n] || 0;
+        const isFreeShip = state.aristoFreeUpgrade === g.n && q > 0;
+        return `
+          <div class="gearrow">
+            <div class="ginfo">
+              <b>${g.n}</b>
+              ${isFreeShip ? '<span class="gfree">1× Free (Aristocrat)</span>' : `<span class="gcost">${g.c}cr</span>`}
+              <div class="gnote">${g.note}</div>
+            </div>
+            <div class="stepper no-print">
+              <button data-g="${g.n}" data-d="-1">&minus;</button>
+              <span class="q" id="${id}">${q}</span>
+              <button data-g="${g.n}" data-d="1">&plus;</button>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `).join("");
+
+  gearSections.querySelectorAll('.stepper button').forEach(b => {
+    b.onclick = () => {
+      const name = b.dataset.g;
+      const delta = +b.dataset.d;
+      state.gear[name] = Math.max(0, (state.gear[name] || 0) + delta);
+      if(state.gear[name] === 0 && state.aristoFreeUpgrade === name){
+        state.aristoFreeUpgrade = "";
+        aristoFreeSelect.value = "";
+      }
+      renderGearCatalog();
+      recalc();
+      saveToLocalStorage();
+    };
+  });
+}
+
+// Populate Aristocrat Free Upgrade selector
+function updateAristoFreeOptions(){
+  aristoFreeSelect.innerHTML = '<option value="">— Claim Free Ship Upgrade —</option>';
+  GEAR.filter(g => g.grp === "Starship Upgrades").forEach(g => {
+    aristoFreeSelect.add(new Option(`${g.n} (${g.c}cr value)`, g.n));
+  });
+  aristoFreeSelect.value = state.aristoFreeUpgrade || "";
+}
+
+aristoFreeSelect.onchange = e => {
+  state.aristoFreeUpgrade = e.target.value;
+  if(state.aristoFreeUpgrade && !(state.gear[state.aristoFreeUpgrade] > 0)){
+    state.gear[state.aristoFreeUpgrade] = 1;
+  }
+  renderGearCatalog();
+  recalc();
+  saveToLocalStorage();
+};
+
+/* ===================== BUDGET & CALCULATIONS ===================== */
+function calculateBudget(){
+  let aristoCount = 0;
+  if(state.cap === "Aristocrat") aristoCount++;
+  if(state.fm === "Aristocrat") aristoCount++;
+  if(aristoCount >= 2) return 500;
+  if(aristoCount === 1) return 450;
+  return 400;
+}
+
+function recalc(){
+  const budget = calculateBudget();
+  let crewSpent = 0;
+  state.crew.forEach(s => { if(s.c > 0) crewSpent += s.c; });
+
+  let gearSpent = 0;
+  let hasFreeApplied = false;
+  Object.entries(state.gear).forEach(([name, q]) => {
+    const item = GEAR.find(g => g.n === name);
+    if(item && q > 0){
+      if(item.grp === "Starship Upgrades" && state.aristoFreeUpgrade === name && !hasFreeApplied){
+        gearSpent += item.c * (q - 1);
+        hasFreeApplied = true;
+      } else {
+        gearSpent += item.c * q;
+      }
+    }
+  });
+
+  const totalSpent = crewSpent + gearSpent;
+  const creditsLeft = budget - totalSpent;
+
+  // Bottom bar
+  document.getElementById('bbBudget').textContent = budget;
+  document.getElementById('bbSpent').textContent = totalSpent;
+  const leftEl = document.getElementById('bbLeft');
+  leftEl.textContent = creditsLeft;
+  leftEl.className = "v " + (creditsLeft < 0 ? "over" : "ok");
+
+  const fill = document.getElementById('bbFill');
+  fill.style.width = Math.min(100, Math.max(0, (totalSpent / budget) * 100)) + "%";
+  fill.classList.toggle('over', creditsLeft < 0);
+
+  // Stats in sticky bar
+  const specCount = state.crew.filter(s => s.t === "Specialist").length;
+  document.getElementById('bbCrew').textContent = `${state.crew.length} / 8`;
+  document.getElementById('bbSpec').textContent = `${specCount} / 4`;
+  document.getElementById('bbPwSum').textContent = `${state.capPw.size + state.fmPw.size} / 10`;
+
+  // Section 1 header pills
+  document.getElementById('capPill').textContent = `Captain: ${state.capPw.size} / 6 Powers`;
+  document.getElementById('capPill').className = "pill " + (state.capPw.size === 6 ? "ok" : state.capPw.size > 6 ? "bad" : "");
+  document.getElementById('fmPill').textContent = `First Mate: ${state.fmPw.size} / 4 Powers`;
+  document.getElementById('fmPill').className = "pill " + (state.fmPw.size === 4 ? "ok" : state.fmPw.size > 4 ? "bad" : "");
+
+  gearSpentPill.textContent = `${gearSpent}cr Spent on Gear`;
+
+  // Aristocrat Banner visibility
+  const hasAristo = state.cap === "Aristocrat" || state.fm === "Aristocrat";
+  document.getElementById('aristoBanner').style.display = hasAristo ? "flex" : "none";
+
+  const aristoNote = document.getElementById('aristoNote');
+  if(budget > 400){
+    aristoNote.innerHTML = `💰 <b>Aristocrat Perk Active:</b> Starting budget increased to <b>${budget}cr</b>${budget === 500 ? ' (both leaders are Aristocrats)' : ''} plus 1 free ship upgrade up to 500cr!`;
+  } else {
+    aristoNote.textContent = "";
+  }
+
+  // Print header line
+  document.getElementById('printBudgetLine').textContent = `Budget: ${budget}cr | Spent: ${totalSpent}cr | Unspent: ${creditsLeft}cr`;
+
+  // Print purchased gear line
+  const pGear = document.getElementById('printPurchasedGear');
+  if(pGear){
+    const gearEntries = Object.entries(state.gear).filter(([_, q]) => q > 0);
+    if(!gearEntries.length){
+      pGear.innerHTML = "<b>Purchased Equipment &amp; Upgrades:</b> None";
+    } else {
+      pGear.innerHTML = "<b>Purchased Equipment &amp; Upgrades:</b> " + gearEntries.map(([n, q]) => {
+        const isFree = state.aristoFreeUpgrade === n;
+        return `${q}&times; ${n}${isFree ? ' (1 Free - Aristocrat)' : ''}`;
+      }).join(" &middot; ");
+    }
+  }
+
+  // Warnings
+  const warns = [];
+  if(creditsLeft < 0) warns.push(`<span class="warn-item">&bull; Over budget by ${-creditsLeft}cr!</span>`);
+  if(state.crew.length > 8) warns.push(`<span class="warn-item">&bull; Too many crew members (max 8)!</span>`);
+  if(specCount > 4) warns.push(`<span class="warn-item">&bull; Specialist cap exceeded: max 4 allowed (currently ${specCount})!</span>`);
+  if(state.houseRules?.maxTwoDuplicateSpecialists){
+    const specCounts = {};
+    state.crew.filter(s => s.t === "Specialist").forEach(s => {
+      specCounts[s.n] = (specCounts[s.n] || 0) + 1;
+    });
+    for(const [name, count] of Object.entries(specCounts)){
+      if(count > 2){
+        warns.push(`<span class="warn-item">&bull; House Rule violated: ${count} ${name}s recruited (max 2)!</span>`);
+      }
+    }
+  }
+  if(state.cap && state.capPw.size < 6) warns.push(`<span class="warn-item info">&bull; Captain needs ${6 - state.capPw.size} more power(s)</span>`);
+  if(state.fm && state.fmPw.size < 4) warns.push(`<span class="warn-item info">&bull; First Mate needs ${4 - state.fmPw.size} more power(s)</span>`);
+  if(state.cap && state.cap === state.fm) warns.push(`<span class="warn-item info">&bull; Note: Captain and First Mate share the same background</span>`);
+
+  document.getElementById('warnMsg').innerHTML = warns.join(" ");
+}
+
+/* ===================== POWER MODAL ===================== */
+const modal = document.getElementById('powerModal');
+function showPowerModal(pName, isFirstMate){
+  const p = POWERS_DATA[pName];
+  if(!p) return;
+  document.getElementById('modalPwName').textContent = pName;
+  const tnVal = isFirstMate ? p.tn + 2 : p.tn;
+  document.getElementById('modalPwTN').textContent = `Activation: TN ${tnVal}${isFirstMate ? ' (+2 FM)' : ''}`;
+  document.getElementById('modalPwStrain').textContent = `Strain: ${p.strain}`;
+  document.getElementById('modalPwType').textContent = p.type;
+  const timing = getPowerTiming(p);
+  const timingEl = document.getElementById('modalPwTiming');
+  if(timingEl){
+    timingEl.textContent = `${timing.icon} ${timing.label}`;
+    timingEl.className = `modal-tag timing-${timing.key}`;
+  }
+  document.getElementById('modalPwDesc').textContent = p.desc;
+  modal.classList.add('open');
+}
+document.getElementById('modalCloseBtn').onclick = () => modal.classList.remove('open');
+modal.onclick = e => { if(e.target === modal) modal.classList.remove('open'); };
+
+/* ===================== DEDICATED POWERS & SPELLS KB ===================== */
+let powersKBSearchQ = "";
+let powersKBCat = "all";
+let powersKBStrain = "all";
+let powersKBTN = "all";
+let powersKBBg = "all";
+let powersKBTiming = "all";
+
+// Populate powers KB Background selector
+const pBgSel = document.getElementById('powersKBBgFilter');
+BG.forEach(b => pBgSel.add(new Option(b.name + " (" + SRC[b.src].label + ")", b.name)));
+
+function renderPowersKB(){
+  const grid = document.getElementById('powersKBGrid');
+  grid.innerHTML = "";
+  const countEl = document.getElementById('powersKBCount');
+
+  const entries = Object.entries(POWERS_DATA).sort((a,b)=>a[0].localeCompare(b[0]));
+  let matched = 0;
+
+  entries.forEach(([name, p]) => {
+    // text query
+    const hay = (name + " " + p.type + " " + p.desc + " " + (POWER_BG_MAP[name]||[]).join(" ")).toLowerCase();
+    if(powersKBSearchQ && !hay.includes(powersKBSearchQ)) return;
+
+    // timing filter
+    const timing = getPowerTiming(p);
+    if(powersKBTiming !== "all" && timing.key !== powersKBTiming) return;
+
+    // category filter
+    if(powersKBCat !== "all"){
+      if(powersKBCat === "Reaction" && !(p.type.includes("Reaction") || p.type.includes("Pre-game"))) return;
+      else if(powersKBCat !== "Reaction" && !p.type.toLowerCase().includes(powersKBCat.toLowerCase())) return;
+    }
+
+    // strain filter
+    if(powersKBStrain !== "all" && p.strain !== +powersKBStrain) return;
+
+    // TN filter
+    if(powersKBTN !== "all" && p.tn !== +powersKBTN) return;
+
+    // background filter
+    if(powersKBBg !== "all"){
+      const bgs = POWER_BG_MAP[name] || [];
+      if(!bgs.includes(powersKBBg)) return;
+    }
+
+    matched++;
+
+    const isCapSel = state.capPw.has(name);
+    const isFmSel = state.fmPw.has(name);
+    const coreBgs = POWER_BG_MAP[name] || [];
+
+    const card = document.createElement('div');
+    card.className = "kb-card";
+    card.innerHTML = `
+      <div class="kb-card-hd">
+        <h4>${name}</h4>
+        <div class="kb-badges">
+          <span class="kb-badge timing-${timing.key}">${timing.icon} ${timing.label}</span>
+          <span class="kb-badge cat">${p.type}</span>
+          <span class="kb-badge strain">Strain ${p.strain}</span>
+        </div>
+      </div>
+
+      <div class="kb-specs-row">
+        <div><span>Captain:</span> <b>TN ${p.tn}</b></div>
+        <div><span>First Mate:</span> <b>TN ${p.tn + 2}</b></div>
+      </div>
+
+      <div class="kb-desc">${p.desc}</div>
+
+      <div class="kb-meta-footer">
+        <div>
+          <span style="font-weight:700">Core to:</span>
+          <span class="kb-bg-tags">
+            ${coreBgs.length ? coreBgs.map(bg => `<span class="kb-bg-tag" data-bg="${bg}">${bg}</span>`).join("") : '<em>None (Universal)</em>'}
+          </span>
+        </div>
+      </div>
+
+      <div class="kb-card-actions no-print">
+        <button class="kb-action-btn ${isCapSel ? 'active' : ''}" data-act="cap" data-name="${name}">
+          ${isCapSel ? '✓ Captain Power' : '+ Pick for Captain'}
+        </button>
+        <button class="kb-action-btn ${isFmSel ? 'active' : ''}" data-act="fm" data-name="${name}">
+          ${isFmSel ? '✓ First Mate Power' : '+ Pick for First Mate'}
+        </button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  countEl.textContent = `Showing ${matched} of ${entries.length} Powers`;
+
+  // Background tag click to filter
+  grid.querySelectorAll('.kb-bg-tag').forEach(tag => {
+    tag.onclick = () => {
+      powersKBBg = tag.dataset.bg;
+      pBgSel.value = powersKBBg;
+      renderPowersKB();
+    };
+  });
+
+  // Action buttons
+  grid.querySelectorAll('.kb-action-btn').forEach(btn => {
+    btn.onclick = () => {
+      const act = btn.dataset.act;
+      const pName = btn.dataset.name;
+      if(act === 'cap'){
+        if(!state.cap){
+          showToast("Please choose a Captain background first in the builder!");
+          return;
+        }
+        if(state.capPw.has(pName)){
+          state.capPw.delete(pName);
+          showToast(`Removed ${pName} from Captain`);
+        } else {
+          if(state.capPw.size >= 6){
+            showToast("Captain already has maximum 6 powers!");
+            return;
+          }
+          state.capPw.add(pName);
+          showToast(`Added ${pName} to Captain`);
+        }
+        renderPwPick('cap');
+      } else if(act === 'fm'){
+        if(!state.fm){
+          showToast("Please choose a First Mate background first in the builder!");
+          return;
+        }
+        if(state.fmPw.has(pName)){
+          state.fmPw.delete(pName);
+          showToast(`Removed ${pName} from First Mate`);
+        } else {
+          if(state.fmPw.size >= 4){
+            showToast("First Mate already has maximum 4 powers!");
+            return;
+          }
+          state.fmPw.add(pName);
+          showToast(`Added ${pName} to First Mate`);
+        }
+        renderPwPick('fm');
+      }
+      recalc();
+      saveToLocalStorage();
+      renderPowersKB();
+    };
+  });
+}
+
+// Powers KB Events
+document.getElementById('powersKBSearch').oninput = e => {
+  powersKBSearchQ = e.target.value.trim().toLowerCase();
+  renderPowersKB();
+};
+
+pBgSel.onchange = e => {
+  powersKBBg = e.target.value;
+  renderPowersKB();
+};
+
+document.querySelectorAll('#view-powers-kb [data-ptiming]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#view-powers-kb [data-ptiming]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    powersKBTiming = btn.dataset.ptiming;
+    renderPowersKB();
+  };
+});
+
+document.querySelectorAll('#view-powers-kb [data-pcat]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#view-powers-kb [data-pcat]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    powersKBCat = btn.dataset.pcat;
+    renderPowersKB();
+  };
+});
+
+document.querySelectorAll('#view-powers-kb [data-pstrain]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#view-powers-kb [data-pstrain]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    powersKBStrain = btn.dataset.pstrain;
+    renderPowersKB();
+  };
+});
+
+document.querySelectorAll('#view-powers-kb [data-ptn]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#view-powers-kb [data-ptn]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    powersKBTN = btn.dataset.ptn;
+    renderPowersKB();
+  };
+});
+
+document.getElementById('powersKBReset').onclick = () => {
+  powersKBSearchQ = "";
+  powersKBTiming = "all";
+  powersKBCat = "all";
+  powersKBStrain = "all";
+  powersKBTN = "all";
+  powersKBBg = "all";
+  document.getElementById('powersKBSearch').value = "";
+  pBgSel.value = "all";
+  document.querySelectorAll('#view-powers-kb .kb-pill').forEach(b => b.classList.remove('active'));
+  document.querySelector('#view-powers-kb [data-ptiming="all"]').classList.add('active');
+  document.querySelector('#view-powers-kb [data-pcat="all"]').classList.add('active');
+  document.querySelector('#view-powers-kb [data-pstrain="all"]').classList.add('active');
+  document.querySelector('#view-powers-kb [data-ptn="all"]').classList.add('active');
+  renderPowersKB();
+};
+
+/* ===================== DEDICATED ARMOURY & ITEMS KB ===================== */
+let itemsKBSearchQ = "";
+let itemsKBCat = "all";
+let itemsKBAvail = "all";
+let itemsKBSlots = "all";
+let itemsKBViewMode = "cards"; // 'cards' or 'table'
+
+function renderItemsKB(){
+  const cardsContainer = document.getElementById('itemsKBCardsContainer');
+  const tableContainer = document.getElementById('itemsKBTableContainer');
+  const tbody = document.querySelector('#itemsKBTable tbody');
+  const countEl = document.getElementById('itemsKBCount');
+
+  cardsContainer.innerHTML = "";
+  tbody.innerHTML = "";
+
+  let matched = 0;
+
+  ITEMS_DATA.forEach(item => {
+    // query filter
+    const hay = (item.n + " " + item.grp + " " + item.note + " " + (item.range||"") + " " + (item.dmg||"") + " " + (item.arm||"") + " " + item.c + "cr").toLowerCase();
+    if(itemsKBSearchQ && !hay.includes(itemsKBSearchQ)) return;
+
+    // category filter
+    if(itemsKBCat !== "all" && item.grp !== itemsKBCat) return;
+
+    // availability filter
+    if(itemsKBAvail !== "all" && item.avail !== itemsKBAvail) return;
+
+    // slots filter
+    if(itemsKBSlots !== "all" && item.slots !== +itemsKBSlots) return;
+
+    matched++;
+
+    const inCrewQty = state.gear[item.n] || 0;
+    const isFreeAristo = state.aristoFreeUpgrade === item.n;
+
+    let availLabel = "Starting Gear";
+    let availClass = "cat";
+    if(item.avail === "loot"){ availLabel = "Advanced Tech / Loot"; availClass = "loot"; }
+    else if(item.avail === "artifact"){ availLabel = "Alien Relic"; availClass = "artifact"; }
+
+    // 1. Render Card
+    const card = document.createElement('div');
+    card.className = "kb-card";
+
+    let specsHtml = "";
+    if(item.grp === "Weapons"){
+      specsHtml = `<div><span>Range:</span> <b>${item.range}</b></div><div><span>Damage:</span> <b>${item.dmg}</b></div><div><span>Slots:</span> <b>${item.slots}</b></div>`;
+    } else if(item.grp === "Armour & Shields"){
+      specsHtml = `<div><span>Armour:</span> <b>${item.arm||"+0"}</b></div><div><span>Move:</span> <b>${item.move||"0"}</b></div><div><span>Slots:</span> <b>${item.slots}</b></div>`;
+    } else {
+      specsHtml = `<div><span>Slots:</span> <b>${item.slots === 0 ? '0 (Implant/Ship)' : item.slots}</b></div><div><span>Type:</span> <b>${item.grp}</b></div>`;
+    }
+
+    card.innerHTML = `
+      <div class="kb-card-hd">
+        <h4>${item.n}</h4>
+        <div style="font-size:14px;font-weight:800;color:var(--gold)">${item.c}cr</div>
+      </div>
+      <div class="kb-badges">
+        <span class="kb-badge cat">${item.grp}</span>
+        <span class="kb-badge ${availClass}">${availLabel}</span>
+        <span class="kb-badge">${item.slots} Gear Slot${item.slots===1?'':'s'}</span>
+      </div>
+
+      <div class="kb-specs-row">${specsHtml}</div>
+
+      <div class="kb-desc">${item.note}</div>
+
+      <div class="kb-meta-footer">
+        <div>
+          ${item.avail === 'creation' ? `<span style="color:var(--muted)">In Roster: <b style="color:${inCrewQty>0?'var(--good)':'var(--ink)'}">${inCrewQty}</b>${isFreeAristo?' (1 Free)':''}</span>` : '<span style="color:var(--purple);font-style:italic">Found via Scenario Loot</span>'}
+        </div>
+        ${item.avail === 'creation' ? `
+          <div class="stepper no-print">
+            <button data-item="${item.n}" data-delta="-1">&minus;</button>
+            <span class="q">${inCrewQty}</span>
+            <button data-item="${item.n}" data-delta="1">&plus;</button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+    cardsContainer.appendChild(card);
+
+    // 2. Render Table Row
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${item.n}</b></td>
+      <td><span class="pill" style="font-size:10px">${item.grp}</span></td>
+      <td style="font-weight:800;color:var(--gold)">${item.c}cr</td>
+      <td>${item.slots}</td>
+      <td style="font-family:monospace;color:var(--good);font-size:11px">${item.range ? 'Rng: '+item.range+' · Dmg: '+item.dmg : item.arm ? 'Arm: '+item.arm+' · Move: '+item.move : '—'}</td>
+      <td><span class="kb-badge ${availClass}">${availLabel}</span></td>
+      <td style="color:#c0cbdf;font-size:12px">${item.note}</td>
+      <td style="text-align:right">
+        ${item.avail === 'creation' ? `
+          <div class="stepper no-print" style="justify-content:flex-end">
+            <button data-item="${item.n}" data-delta="-1">&minus;</button>
+            <span class="q">${inCrewQty}</span>
+            <button data-item="${item.n}" data-delta="1">&plus;</button>
+          </div>
+        ` : '<span style="color:var(--muted);font-size:11px">Loot</span>'}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  countEl.textContent = `Showing ${matched} of ${ITEMS_DATA.length} Items`;
+
+  // Attach stepper actions on both views
+  const steppers = document.querySelectorAll('#view-items-kb .stepper button');
+  steppers.forEach(b => {
+    b.onclick = () => {
+      const iName = b.dataset.item;
+      const delta = +b.dataset.delta;
+      state.gear[iName] = Math.max(0, (state.gear[iName] || 0) + delta);
+      if(state.gear[iName] === 0 && state.aristoFreeUpgrade === iName){
+        state.aristoFreeUpgrade = "";
+        aristoFreeSelect.value = "";
+      }
+      renderGearCatalog();
+      recalc();
+      saveToLocalStorage();
+      renderItemsKB();
+      showToast(`${delta > 0 ? 'Added' : 'Updated'} ${iName} (Total: ${state.gear[iName]})`);
+    };
+  });
+}
+
+// Items KB Filter Events
+document.getElementById('itemsKBSearch').oninput = e => {
+  itemsKBSearchQ = e.target.value.trim().toLowerCase();
+  renderItemsKB();
+};
+
+document.querySelectorAll('#view-items-kb [data-icat]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#view-items-kb [data-icat]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    itemsKBCat = btn.dataset.icat;
+    renderItemsKB();
+  };
+});
+
+document.querySelectorAll('#view-items-kb [data-iavail]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#view-items-kb [data-iavail]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    itemsKBAvail = btn.dataset.iavail;
+    renderItemsKB();
+  };
+});
+
+document.querySelectorAll('#view-items-kb [data-islots]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#view-items-kb [data-islots]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    itemsKBSlots = btn.dataset.islots;
+    renderItemsKB();
+  };
+});
+
+document.getElementById('itemsKBReset').onclick = () => {
+  itemsKBSearchQ = "";
+  itemsKBCat = "all";
+  itemsKBAvail = "all";
+  itemsKBSlots = "all";
+  document.getElementById('itemsKBSearch').value = "";
+  document.querySelectorAll('#view-items-kb .kb-pill').forEach(b => b.classList.remove('active'));
+  document.querySelector('#view-items-kb [data-icat="all"]').classList.add('active');
+  document.querySelector('#view-items-kb [data-iavail="all"]').classList.add('active');
+  document.querySelector('#view-items-kb [data-islots="all"]').classList.add('active');
+  renderItemsKB();
+};
+
+// View Toggle: Cards vs Table
+const viewCardsBtn = document.getElementById('itemsViewCardsBtn');
+const viewTableBtn = document.getElementById('itemsViewTableBtn');
+const cardsContainer = document.getElementById('itemsKBCardsContainer');
+const tableContainer = document.getElementById('itemsKBTableContainer');
+
+viewCardsBtn.onclick = () => {
+  viewCardsBtn.classList.add('active');
+  viewTableBtn.classList.remove('active');
+  cardsContainer.style.display = "grid";
+  tableContainer.style.display = "none";
+  itemsKBViewMode = "cards";
+};
+
+viewTableBtn.onclick = () => {
+  viewTableBtn.classList.add('active');
+  viewCardsBtn.classList.remove('active');
+  cardsContainer.style.display = "none";
+  tableContainer.style.display = "block";
+  itemsKBViewMode = "table";
+};
+
+/* ===================== REFERENCE CODEX VIEW ===================== */
+const refGrid = document.getElementById('refGrid');
+const refCount = document.getElementById('refCount');
+let refFilter = "all";
+let refQuery = "";
+
+function renderRefCodex(){
+  refGrid.innerHTML = "";
+  let shown = 0;
+  BG.forEach(b => {
+    const matchF = refFilter === "all" || b.src === refFilter;
+    const synText = b.synergies ? Object.values(b.synergies).join(" ") : "";
+    const hay = (b.name + " " + (b.role||"") + " " + b.powers.join(" ") + " " + (b.desc||"") + " " + b.flavor + " " + (b.special||"") + " " + synText).toLowerCase();
+    const matchQ = !refQuery || hay.includes(refQuery);
+    if(!(matchF && matchQ)) return;
+    shown++;
+    const s = SRC[b.src];
+    const d = document.createElement('div');
+    d.className = "card";
+    d.innerHTML = `
+      <div class="top">
+        ${b.cap ? '<span class="badge-cap">Captain Only</span>' : ''}
+        <h2>${b.name}</h2>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap">
+          <span class="src ${s.cls}">${s.label}</span>
+          ${b.role ? `<span class="pill" style="font-size:10px;color:var(--accent);border-color:rgba(73,214,255,0.35);background:rgba(73,214,255,0.08)">${b.role}</span>` : ''}
+        </div>
+      </div>
+      <div class="body">
+        <div>
+          <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:4px">Stat Modifications</div>
+          <div style="font-size:13px;color:var(--good);font-weight:600">${b.stats}</div>
+        </div>
+
+        ${b.desc ? `
+        <div class="ref-desc-box">
+          <div class="lbl">📖 Lore &amp; Background Overview</div>
+          <div>${b.desc}</div>
+        </div>
+        ` : `<div class="flavor">${b.flavor}</div>`}
+
+        <div>
+          <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px">Core Powers (${b.powers.length})</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${b.powers.map(p => {
+              const pData = POWERS_DATA[p] || { tn: 10 };
+              const timing = getPowerTiming(pData);
+              return `<span class="pwopt" data-pname="${p}" style="font-size:11px;padding:3px 8px"><span>${p}</span> <span class="timing-chip timing-${timing.key}" title="${timing.label} Power">${timing.icon} ${timing.label}</span> <span class="tn">TN ${pData.tn}</span></span>`;
+            }).join("")}
+          </div>
+        </div>
+
+        ${b.synergies ? `
+        <div class="ref-synergy-box">
+          <div class="lbl">🤝 Tactical Synergies &amp; Pairings</div>
+          <div class="syn-item"><b>Partner Pairings:</b> ${b.synergies.firstMate}</div>
+          <div class="syn-item"><b class="gold">Crew Synergies:</b> ${b.synergies.crew}</div>
+          <div class="syn-item"><b class="green">Signature Combos:</b> ${b.synergies.combos}</div>
+          <div class="syn-item"><b style="color:var(--purple)">Recommended Loadout:</b> ${b.synergies.gear}</div>
+        </div>
+        ` : ''}
+
+        ${b.special ? `<div class="special-box"><div class="lbl">Special Rules</div>${b.special}</div>` : ''}
+      </div>
+    `;
+    refGrid.appendChild(d);
+  });
+  refCount.textContent = `Showing ${shown} of ${BG.length} backgrounds`;
+
+  refGrid.querySelectorAll('.pwopt').forEach(chip => {
+    chip.onclick = () => showPowerModal(chip.dataset.pname, false);
+  });
+}
+
+document.querySelectorAll('#ref-sub-bg .filter-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#ref-sub-bg .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    refFilter = btn.dataset.f;
+    renderRefCodex();
+  };
+});
+
+document.getElementById('refSearch').oninput = e => {
+  refQuery = e.target.value.trim().toLowerCase();
+  renderRefCodex();
+};
+
+/* Soldiers Ref Table */
+function renderRefSoldiersTable(){
+  const tbody = document.querySelector('#refSoldierTable tbody');
+  tbody.innerHTML = SOLDIERS.map(s => `
+    <tr>
+      <td><b>${s.n}</b></td>
+      <td><span class="type-tag ${s.t.toLowerCase()}">${s.t}</span></td>
+      <td>${s.m}</td><td>${s.f}</td><td>${s.s}</td><td>${s.a}</td><td>${s.w}</td><td>${s.h}</td>
+      <td style="font-weight:700;color:${s.c<0?'var(--good)':'var(--gold)'}">${s.c<0?'Free':s.c+'cr'}</td>
+      <td><span class="srcbook">${s.b}</span></td>
+      <td style="color:var(--muted);font-size:11.5px">${s.note}</td>
+    </tr>
+  `).join("");
+}
+
+/* ===================== IMPORT / EXPORT / PRINT / SHARE ===================== */
+
+// Print Roster
+document.getElementById('printBtn').onclick = () => {
+  window.print();
+};
+
+// Export to JSON
+document.getElementById('exportBtn').onclick = () => {
+  const json = JSON.stringify({
+    stargraveVersion: "1.0",
+    date: new Date().toISOString(),
+    meta: state.meta,
+    houseRules: state.houseRules,
+    cap: state.cap,
+    capName: state.capName,
+    capPw: Array.from(state.capPw),
+    capStatChoices: state.capStatChoices,
+    fm: state.fm,
+    fmName: state.fmName,
+    fmPw: Array.from(state.fmPw),
+    fmStatChoices: state.fmStatChoices,
+    crew: state.crew,
+    gear: state.gear,
+    aristoFreeUpgrade: state.aristoFreeUpgrade
+  }, null, 2);
+
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safeName = (state.meta.crewName || "stargrave_crew").replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  a.href = url;
+  a.download = `${safeName}_roster.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Import from JSON
+document.getElementById('importInput').onchange = e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const d = JSON.parse(ev.target.result);
+      state.meta = d.meta || { crewName:"", shipName:"", notes:"" };
+      state.houseRules = d.houseRules || { maxTwoDuplicateSpecialists: false };
+      state.cap = d.cap || null;
+      state.capName = d.capName || "";
+      state.capPw = new Set(d.capPw || []);
+      state.capStatChoices = d.capStatChoices || {};
+      state.fm = d.fm || null;
+      state.fmName = d.fmName || "";
+      state.fmPw = new Set(d.fmPw || []);
+      state.fmStatChoices = d.fmStatChoices || {};
+      state.crew = d.crew || [];
+      state.gear = d.gear || {};
+      state.aristoFreeUpgrade = d.aristoFreeUpgrade || "";
+
+      syncFormFromState();
+      saveToLocalStorage();
+      showToast("Roster imported successfully!");
+    } catch(err) {
+      alert("Invalid JSON crew roster file.");
+      console.error(err);
+    }
+  };
+  reader.readAsText(file);
+};
+
+// Copy Text Summary for Discord / Forums
+document.getElementById('copyTextBtn').onclick = () => {
+  const budget = calculateBudget();
+  let crewSpent = 0;
+  state.crew.forEach(s => { if(s.c > 0) crewSpent += s.c; });
+  let gearSpent = 0;
+  let hasFree = false;
+  Object.entries(state.gear).forEach(([n, q]) => {
+    const item = GEAR.find(g => g.n === n);
+    if(item && q > 0){
+      if(item.grp === "Starship Upgrades" && state.aristoFreeUpgrade === n && !hasFree){
+        gearSpent += item.c * (q - 1);
+        hasFree = true;
+      } else {
+        gearSpent += item.c * q;
+      }
+    }
+  });
+  const totalSpent = crewSpent + gearSpent;
+  const left = budget - totalSpent;
+
+  const capStats = calculateStats('cap') || BASE_STATS;
+  const fmStats = calculateStats('fm') || BASE_STATS;
+
+  let txt = `🛸 **${state.meta.crewName || "Unnamed Crew"}** | Ship: *${state.meta.shipName || "Unnamed Ship"}*\n`;
+  txt += `💰 Budget: ${budget}cr | Spent: ${totalSpent}cr | Banked: ${left}cr\n\n`;
+
+  txt += `👤 **Captain: ${state.capName || "Captain"}** (${state.cap || "No Background"})\n`;
+  txt += `Stats: M:${capStats.m}" F:+${capStats.f} S:+${capStats.s} A:${capStats.a} W:+${capStats.w} H:${capStats.h}\n`;
+  txt += `Powers (${state.capPw.size}/6): ${Array.from(state.capPw).map(p => {
+    const pData = POWERS_DATA[p];
+    const tim = getPowerTiming(pData).label;
+    return `${p} [${tim}, TN ${pData?.tn||10}]`;
+  }).join(", ") || "None"}\n\n`;
+
+  txt += `👥 **First Mate: ${state.fmName || "First Mate"}** (${state.fm || "No Background"})\n`;
+  txt += `Stats: M:${fmStats.m}" F:+${fmStats.f} S:+${fmStats.s} A:${fmStats.a} W:+${fmStats.w} H:${fmStats.h}\n`;
+  txt += `Powers (${state.fmPw.size}/4): ${Array.from(state.fmPw).map(p => {
+    const pData = POWERS_DATA[p];
+    const tim = getPowerTiming(pData).label;
+    return `${p} [${tim}, TN ${(pData?.tn||10)+2}]`;
+  }).join(", ") || "None"}\n\n`;
+
+  const specCount = state.crew.filter(s => s.t === "Specialist").length;
+  txt += `🎖 **Crew Members (${state.crew.length}/8, ${specCount}/4 Specialists):**\n`;
+  if(!state.crew.length) txt += `  (No soldiers recruited)\n`;
+  else {
+    state.crew.forEach((s, idx) => {
+      const cStr = s.c < 0 ? "Free" : `${s.c}cr`;
+      txt += `  ${idx + 1}. ${s.customName || s.n} (${s.t}, ${s.b}) — M:${s.m}" F:${s.f} S:${s.s} A:${s.a} W:${s.w} H:${s.h} | ${s.note} [${cStr}]\n`;
+    });
+  }
+
+  const gearEntries = Object.entries(state.gear).filter(([_, q]) => q > 0);
+  if(gearEntries.length){
+    txt += `\n📦 **Purchased Equipment & Ship Upgrades:**\n`;
+    gearEntries.forEach(([n, q]) => {
+      const isFree = state.aristoFreeUpgrade === n;
+      txt += `  • ${q}× ${n} ${isFree ? '(1 Free - Aristocrat)' : ''}\n`;
+    });
+  }
+
+  if(state.houseRules?.maxTwoDuplicateSpecialists){
+    txt += `\n⚖️ **Active House Rules:** Limit Duplicate Specialists (Max 2 of same type)\n`;
+  }
+
+  navigator.clipboard.writeText(txt).then(() => {
+    showToast("Crew roster copied to clipboard!");
+  }).catch(() => {
+    alert("Copied to clipboard failed; please check permissions.");
+  });
+};
+
+// Reset
+document.getElementById('resetBtn').onclick = () => {
+  if(!confirm("Reset entire crew builder to blank? All current picks will be cleared.")) return;
+  state.meta = { crewName:"", shipName:"", notes:"" };
+  state.houseRules = { maxTwoDuplicateSpecialists: false };
+  state.cap = null; state.capName = ""; state.capPw.clear(); state.capStatChoices = {};
+  state.fm = null; state.fmName = ""; state.fmPw.clear(); state.fmStatChoices = {};
+  state.crew = []; state.gear = {}; state.aristoFreeUpgrade = "";
+  localStorage.removeItem(STORAGE_KEY);
+  syncFormFromState();
+  showToast("Crew reset to blank.");
+};
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function escapeHtml(str){
+  return (str||"").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+/* ===================== HOUSE RULES ===================== */
+function updateHouseRulesUI(){
+  const isMax2 = !!(state.houseRules && state.houseRules.maxTwoDuplicateSpecialists);
+  const chk = document.getElementById('ruleMaxTwoSpecs');
+  if(chk) chk.checked = isMax2;
+
+  const activeCount = isMax2 ? 1 : 0;
+  const pill = document.getElementById('houseRulesActivePill');
+  if(pill){
+    pill.textContent = `${activeCount} Active`;
+    pill.className = "pill " + (activeCount > 0 ? "ok" : "");
+  }
+
+  const specPill = document.getElementById('ruleSpecNoticePill');
+  if(specPill){
+    specPill.style.display = isMax2 ? "inline-flex" : "none";
+  }
+}
+
+document.getElementById('ruleMaxTwoSpecs').onchange = e => {
+  if(!state.houseRules) state.houseRules = {};
+  state.houseRules.maxTwoDuplicateSpecialists = e.target.checked;
+  updateHouseRulesUI();
+  syncPrintHeader();
+  renderSoldierCatalog();
+  recalc();
+  saveToLocalStorage();
+};
+
+document.getElementById('toggleHouseRules').onclick = () => {
+  const body = document.getElementById('houseRulesBody');
+  const chev = document.getElementById('rulesChevron');
+  body.classList.toggle('collapsed');
+  chev.classList.toggle('collapsed');
+};
+
+/* ===================== INITIALIZATION ===================== */
+function syncFormFromState(){
+  crewNameInput.value = state.meta.crewName || "";
+  shipNameInput.value = state.meta.shipName || "";
+  campaignNotesInput.value = state.meta.notes || "";
+  capNameInput.value = state.capName || "";
+  fmNameInput.value = state.fmName || "";
+  capSel.value = state.cap || "";
+  fmSel.value = state.fm || "";
+
+  updateHouseRulesUI();
+  syncPrintHeader();
+  renderLeaderStats('cap');
+  renderLeaderStats('fm');
+  renderPwPick('cap');
+  renderPwPick('fm');
+  renderRoster();
+  renderSoldierCatalog();
+  updateAristoFreeOptions();
+  renderGearCatalog();
+  recalc();
+}
+
+// Load previous work if saved
+loadFromLocalStorage();
+syncFormFromState();
+renderRefCodex();
+renderPowersKB();
+renderItemsKB();
+renderRefSoldiersTable();
+</script>
+</body>
+</html>
