@@ -51,30 +51,27 @@ This repository is pre-configured and ready to host publicly on **GitHub Pages**
 4. Leave *"Initialize with README"* unchecked (we already have one).
 5. Click **Create repository**.
 
-### Step 2: Push the Code to GitHub
-Open PowerShell or your terminal in this project directory:
+### Step 2: Push Updates to GitHub
+You can use **GitHub Desktop** or run Git from the terminal:
 
 ```bash
-git init
 git add .
-git commit -m "Initial release of Stargrave Crew Builder"
-git branch -M main
-git remote add origin https://github.com/<YOUR-GITHUB-USERNAME>/<YOUR-REPO-NAME>.git
-git push -u origin main
+git commit -m "Update powers with activation rules, strain recoil, and interactive navigation"
+git push
 ```
 
-*(Alternatively, you can upload all files directly using the GitHub web interface: click **Add file** -> **Upload files** and drag the contents of this folder into GitHub).*
+*(If using **GitHub Desktop**, simply commit the modified files and click **Push origin**).*
 
 ---
 
 ### Step 3: Enable GitHub Pages
-1. On your GitHub repository page, click **Settings** (top tabs).
-2. In the left sidebar, click **Pages** (under *Code and automation*).
+1. On your GitHub repository page: [github.com/Raunok87/Stargrave-Crew-Builder](https://github.com/Raunok87/Stargrave-Crew-Builder)
+2. Click **Settings** (top navigation bar) -> **Pages** (in left sidebar).
 3. Under **Build and deployment**:
    - **Source**: Select **Deploy from a branch**.
    - **Branch**: Select `main` and folder `/ (root)`.
 4. Click **Save**.
-5. Within 1–2 minutes, GitHub Pages will deploy your site at `https://<YOUR-USERNAME>.github.io/<YOUR-REPO-NAME>/`.
+5. Within 1–2 minutes, GitHub Pages will deploy your site at `https://raunok87.github.io/Stargrave-Crew-Builder/`.
 
 ---
 
@@ -85,7 +82,7 @@ git push -u origin main
 2. Add a **CNAME record**:
    - **Type**: `CNAME`
    - **Name / Host**: `stargrave` (or your chosen subdomain prefix)
-   - **Target / Value**: `<YOUR-GITHUB-USERNAME>.github.io`
+   - **Target / Value**: `raunok87.github.io`
    - **TTL**: Auto or 3600
 
 #### B. If using an Apex Domain (e.g., `yourdomain.com`):
@@ -95,7 +92,7 @@ git push -u origin main
    - `185.199.110.153`
    - `185.199.111.153`
 2. (Optional) Add a CNAME for `www`:
-   - **Type**: `CNAME` | **Name**: `www` | **Target**: `<YOUR-GITHUB-USERNAME>.github.io`
+   - **Type**: `CNAME` | **Name**: `www` | **Target**: `raunok87.github.io`
 
 #### C. Set Custom Domain in GitHub:
 1. In your GitHub repository, go to **Settings** -> **Pages**.

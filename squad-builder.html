@@ -388,8 +388,9 @@
   }
   .modal-overlay.open{display:flex}
   .modal-card{
-    background:#0d1629; border:1px solid var(--accent); border-radius:14px; max-width:480px; width:100%;
+    background:#0d1629; border:1px solid var(--accent); border-radius:14px; max-width:560px; width:100%;
     padding:20px 22px; box-shadow:0 15px 50px rgba(0,0,0,0.8); position:relative;
+    max-height:88vh; overflow-y:auto;
   }
   .modal-card h3{margin:0; font-size:18px; color:var(--accent); display:flex; justify-content:space-between; align-items:center}
   .modal-close{background:transparent; border:none; color:var(--muted); font-size:20px; cursor:pointer}
@@ -402,6 +403,36 @@
   .modal-tag.timing-during{color:var(--accent); border-color:rgba(73,214,255,0.45); background:rgba(73,214,255,0.1)}
   .modal-tag.timing-after{color:var(--purple); border-color:rgba(179,136,255,0.5); background:rgba(179,136,255,0.12)}
   .modal-desc{font-size:13.5px; color:#d8e2f8; line-height:1.55; margin-top:8px}
+
+  .modal-guide-box{
+    margin-top:14px; background:#070d18; border:1px solid var(--line); border-radius:10px; padding:12px 14px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .modal-guide-box .guide-title{
+    font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--accent); font-weight:800;
+    display:flex; align-items:center; gap:6px; border-bottom:1px solid rgba(36,50,79,0.5); padding-bottom:6px;
+  }
+  .guide-step{
+    font-size:12px; line-height:1.5; color:#c7d4ee; display:flex; gap:8px; align-items:flex-start;
+  }
+  .guide-step b{color:#fff}
+  .guide-step-icon{font-size:13px; flex-shrink:0; margin-top:1px}
+
+  .modal-nav-box{
+    margin-top:12px; padding-top:12px; border-top:1px solid var(--line); display:flex; flex-direction:column; gap:8px;
+  }
+  .modal-nav-box .nav-title{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:700;
+  }
+  .modal-nav-btns{display:flex; gap:8px; flex-wrap:wrap}
+  .modal-nav-btn{
+    flex:1; min-width:140px; background:#0e172a; border:1px solid var(--line); color:var(--ink);
+    padding:7px 12px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:6px; transition:.15s;
+  }
+  .modal-nav-btn:hover{border-color:var(--accent); color:var(--accent)}
+  .modal-nav-btn.active{background:rgba(95,224,160,0.18); border-color:var(--good); color:var(--good)}
+  .modal-nav-hint{font-size:11px; color:var(--muted); font-style:italic}
 
   /* Reference Directory View */
   .ref-subtabs{display:flex; gap:8px; justify-content:center; margin:16px 0; flex-wrap:wrap}
@@ -517,6 +548,20 @@
   .kb-specs-row span{color:var(--muted); font-family:sans-serif}
 
   .kb-desc{font-size:12.5px; color:#c7d3ea; line-height:1.55}
+
+  /* KB Card How to Operate Block */
+  .kb-guide-block{
+    background:#050912; border:1px solid rgba(36,50,79,0.7); border-radius:8px; padding:9px 12px;
+    display:flex; flex-direction:column; gap:6px; margin:4px 0;
+  }
+  .kb-guide-title{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.8px; color:var(--accent); font-weight:800;
+  }
+  .kb-guide-meta{font-size:10.5px; color:var(--gold); font-weight:700; text-transform:none; letter-spacing:normal}
+  .kb-guide-grid{display:flex; flex-direction:column; gap:4px; font-size:11.5px; color:#c0cce5; line-height:1.45}
+  .kb-guide-grid b{color:#fff}
+  .kb-nav-hint{font-size:10.5px; color:var(--muted); font-style:italic; margin-top:2px}
 
   .kb-meta-footer{
     display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
@@ -1089,6 +1134,21 @@
       <span class="modal-tag" id="modalPwTiming">During Game</span>
     </div>
     <div class="modal-desc" id="modalPwDesc">Power description text...</div>
+
+    <!-- How to Use & Operate Section -->
+    <div class="modal-guide-box" id="modalPwGuide">
+      <div class="guide-title">🎯 How to Use &amp; Operate in Game</div>
+      <div class="guide-grid" id="modalPwGuideGrid"></div>
+    </div>
+
+    <!-- Builder Navigation & Crew Assignment -->
+    <div class="modal-nav-box" id="modalPwNav">
+      <div class="nav-title">
+        <span>🧭 Crew Assignment &amp; Navigation</span>
+        <span style="font-size:10px;color:var(--muted);text-transform:none">Press Esc or click outside to close</span>
+      </div>
+      <div class="modal-nav-btns" id="modalPwNavBtns"></div>
+    </div>
   </div>
 </div>
 
@@ -1422,6 +1482,75 @@ function getPowerTiming(pDataOrName){
     return { key: "after", label: "After Game", short: "After", icon: "🏆" };
   }
   return { key: "during", label: "During Game", short: "During", icon: "⚔️" };
+}
+
+// Detailed Instructions for How to Use / Operate / Navigate each Power/Skill
+function getPowerInstructions(pName, isFirstMate){
+  const p = POWERS_DATA[pName] || { tn: 10, strain: 0, type: "Line of Sight", desc: "" };
+  const timing = getPowerTiming(p);
+  const capTN = p.tn;
+  const fmTN = p.tn + 2;
+  const currentTN = isFirstMate ? fmTN : capTN;
+  const tLower = (p.type || "").toLowerCase();
+
+  // 1. Timing & Action Cost
+  let timingCost = "";
+  let timingIcon = "⚡";
+  if(timing.key === "before"){
+    timingCost = "Before Game Phase: Rolled during scenario setup before round 1 begins. Does not cost an in-game combat action.";
+    timingIcon = "⏳";
+  } else if(timing.key === "after"){
+    timingCost = "Post-Game Campaign Phase: Rolled after the scenario concludes during exploration & trade sequence. Zero combat actions spent.";
+    timingIcon = "🏆";
+  } else if(tLower.includes("reaction")){
+    timingCost = "Immediate Reaction: Triggers defensively upon qualifying event (e.g. reduced to 0 Health). Zero regular action cost.";
+    timingIcon = "🛡️";
+  } else if(tLower.includes("pre-turn")){
+    timingCost = "Pre-Turn Step: Used immediately before rolling initiative for the round. Zero standard action cost.";
+    timingIcon = "🎲";
+  } else {
+    timingCost = "Standard In-Game Activation: Costs 1 Action during this figure's activation turn. Only 1 power activation permitted per turn.";
+    timingIcon = "⚔️";
+  }
+
+  // 2. Dice Roll & Target Number
+  let rollRule = `Roll 1d20 ≥ TN ${currentTN} (${isFirstMate ? 'First Mate TN' : 'Captain TN'}). Captain base is TN ${capTN}; First Mate is TN ${fmTN}.`;
+  let pushRule = `Health Burn (Push): Figure may voluntarily suffer damage to gain +1 to the activation roll per 1 Health sacrificed.`;
+
+  // 3. Targeting & Range
+  let targeting = "";
+  if(tLower.includes("line of sight")){
+    targeting = "Requires visible Line of Sight to target model or token within range (up to 24\" unless stated). Target cannot be completely concealed.";
+  } else if(tLower.includes("self")){
+    targeting = "Self-targeting: Affects only the activating figure. No Line of Sight or range check required.";
+  } else if(tLower.includes("touch")){
+    targeting = "Touch range: Must be in base contact with friendly model (or within 6\" if specified in description).";
+  } else if(tLower.includes("area")){
+    targeting = "Area effect: Emanates in a radius from target or figure; affects all models in zone.";
+  } else {
+    targeting = "Standard targeting rules apply as stated in ability description.";
+  }
+
+  // 4. Strain & Failure
+  let strainRule = "";
+  if(p.strain > 0){
+    strainRule = `Recoil Strain ${p.strain}: User takes ${p.strain} unavoidable damage upon activation. On a failure, figure also suffers (TN - Roll - Will) damage (minimum 1).`;
+  } else {
+    strainRule = `Strain 0 (Safe): No recoil on success. On a failure, figure takes (TN - Roll - Will) damage (minimum 0).`;
+  }
+
+  // 5. Navigation & Builder Operation
+  const isCap = state.capPw ? state.capPw.has(pName) : false;
+  const isFm = state.fmPw ? state.fmPw.has(pName) : false;
+  const coreBgs = POWER_BG_MAP[pName] || [];
+
+  return {
+    p, timing, capTN, fmTN, currentTN,
+    timingCost, timingIcon,
+    rollRule, pushRule,
+    targeting, strainRule,
+    isCap, isFm, coreBgs
+  };
 }
 
 // Soldiers Catalog (Cost -1 = Free)
@@ -1925,11 +2054,11 @@ function renderPwPick(which){
         const displayTN = which === 'fm' ? pData.tn + 2 : pData.tn;
         const timing = getPowerTiming(pData);
         return `
-          <div class="pwopt ${on ? 'sel' : ''} ${dis ? 'disabled' : ''}" data-which="${which}" data-pw="${p}">
+          <div class="pwopt ${on ? 'sel' : ''} ${dis ? 'disabled' : ''}" data-which="${which}" data-pw="${p}" title="${p} (${timing.label}, TN ${displayTN}) — Click chip to toggle crew selection. Click ℹ️ for activation rules, dice roll, strain, and navigation guide">
             <span>${p}</span>
             <span class="timing-chip timing-${timing.key}" title="${timing.label} Power">${timing.icon} ${timing.label}</span>
             <span class="tn" title="Activation Target Number">TN ${displayTN}</span>
-            <span class="info-icon" title="View power rules summary" data-info="${p}">ℹ️</span>
+            <span class="info-icon" title="View full rules, activation instructions, and crew navigation" data-info="${p}">ℹ️</span>
           </div>
         `;
       }).join("")}
@@ -2343,6 +2472,8 @@ const modal = document.getElementById('powerModal');
 function showPowerModal(pName, isFirstMate){
   const p = POWERS_DATA[pName];
   if(!p) return;
+  const guide = getPowerInstructions(pName, isFirstMate);
+
   document.getElementById('modalPwName').textContent = pName;
   const tnVal = isFirstMate ? p.tn + 2 : p.tn;
   document.getElementById('modalPwTN').textContent = `Activation: TN ${tnVal}${isFirstMate ? ' (+2 FM)' : ''}`;
@@ -2355,10 +2486,123 @@ function showPowerModal(pName, isFirstMate){
     timingEl.className = `modal-tag timing-${timing.key}`;
   }
   document.getElementById('modalPwDesc').textContent = p.desc;
+
+  // Render How to Use & Operate Section
+  const guideBox = document.getElementById('modalPwGuideGrid');
+  if(guideBox){
+    guideBox.innerHTML = `
+      <div class="guide-step">
+        <span class="guide-step-icon">${guide.timingIcon}</span>
+        <div><b>Activation &amp; Action Cost:</b> ${guide.timingCost}</div>
+      </div>
+      <div class="guide-step">
+        <span class="guide-step-icon">🎲</span>
+        <div><b>Dice Roll &amp; Target Number:</b> ${guide.rollRule}</div>
+      </div>
+      <div class="guide-step">
+        <span class="guide-step-icon">💡</span>
+        <div><b>Health Burn (Push):</b> ${guide.pushRule}</div>
+      </div>
+      <div class="guide-step">
+        <span class="guide-step-icon">🎯</span>
+        <div><b>Targeting &amp; Range:</b> ${guide.targeting}</div>
+      </div>
+      <div class="guide-step">
+        <span class="guide-step-icon">🩸</span>
+        <div><b>Strain &amp; Failure Penalty:</b> ${guide.strainRule}</div>
+      </div>
+    `;
+  }
+
+  // Render Navigation & Crew Assignment Actions
+  const navBtns = document.getElementById('modalPwNavBtns');
+  if(navBtns){
+    const isCap = state.capPw.has(pName);
+    const isFm = state.fmPw.has(pName);
+    const coreBgs = POWER_BG_MAP[pName] || [];
+
+    navBtns.innerHTML = `
+      <button class="modal-nav-btn ${isCap ? 'active' : ''}" id="modalActCap">
+        ${isCap ? '✓ In Captain Roster (Click to Remove)' : '+ Add to Captain'}
+      </button>
+      <button class="modal-nav-btn ${isFm ? 'active' : ''}" id="modalActFm">
+        ${isFm ? '✓ In First Mate Roster (Click to Remove)' : '+ Add to First Mate'}
+      </button>
+      ${coreBgs.length ? `<button class="modal-nav-btn" id="modalActCodex">📖 View ${coreBgs[0]} Codex</button>` : ''}
+    `;
+
+    document.getElementById('modalActCap').onclick = () => {
+      if(!state.cap){
+        showToast("Please select a Captain background in the builder first!");
+        return;
+      }
+      if(state.capPw.has(pName)){
+        state.capPw.delete(pName);
+        showToast(`Removed ${pName} from Captain`);
+      } else {
+        if(state.capPw.size >= 6){
+          showToast("Captain already has maximum 6 powers!");
+          return;
+        }
+        state.capPw.add(pName);
+        showToast(`Added ${pName} to Captain`);
+      }
+      renderPwPick('cap');
+      recalc();
+      saveToLocalStorage();
+      renderPowersKB();
+      showPowerModal(pName, isFirstMate);
+    };
+
+    document.getElementById('modalActFm').onclick = () => {
+      if(!state.fm){
+        showToast("Please select a First Mate background in the builder first!");
+        return;
+      }
+      if(state.fmPw.has(pName)){
+        state.fmPw.delete(pName);
+        showToast(`Removed ${pName} from First Mate`);
+      } else {
+        if(state.fmPw.size >= 4){
+          showToast("First Mate already has maximum 4 powers!");
+          return;
+        }
+        state.fmPw.add(pName);
+        showToast(`Added ${pName} to First Mate`);
+      }
+      renderPwPick('fm');
+      recalc();
+      saveToLocalStorage();
+      renderPowersKB();
+      showPowerModal(pName, isFirstMate);
+    };
+
+    if(coreBgs.length && document.getElementById('modalActCodex')){
+      document.getElementById('modalActCodex').onclick = () => {
+        modal.classList.remove('open');
+        // Switch to ref tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('.tab[data-v="ref"]').classList.add('active');
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-ref').classList.add('active');
+        refQuery = coreBgs[0].toLowerCase();
+        const searchInput = document.getElementById('refSearch');
+        if(searchInput) searchInput.value = coreBgs[0];
+        renderRefCodex();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+    }
+  }
+
   modal.classList.add('open');
 }
 document.getElementById('modalCloseBtn').onclick = () => modal.classList.remove('open');
 modal.onclick = e => { if(e.target === modal) modal.classList.remove('open'); };
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && modal.classList.contains('open')){
+    modal.classList.remove('open');
+  }
+});
 
 /* ===================== DEDICATED POWERS & SPELLS KB ===================== */
 let powersKBSearchQ = "";
@@ -2413,11 +2657,13 @@ function renderPowersKB(){
     const isFmSel = state.fmPw.has(name);
     const coreBgs = POWER_BG_MAP[name] || [];
 
+    const guide = getPowerInstructions(name, false);
+
     const card = document.createElement('div');
     card.className = "kb-card";
     card.innerHTML = `
       <div class="kb-card-hd">
-        <h4>${name}</h4>
+        <h4 style="cursor:pointer" title="Click to open rules &amp; assignment modal">${name} ℹ️</h4>
         <div class="kb-badges">
           <span class="kb-badge timing-${timing.key}">${timing.icon} ${timing.label}</span>
           <span class="kb-badge cat">${p.type}</span>
@@ -2432,13 +2678,28 @@ function renderPowersKB(){
 
       <div class="kb-desc">${p.desc}</div>
 
+      <!-- How to Operate & Use Block -->
+      <div class="kb-guide-block">
+        <div class="kb-guide-title">
+          <span>🎯 How to Operate:</span>
+          <span class="kb-guide-meta">Roll 1d20 ≥ TN ${p.tn} (Cap) / ${p.tn + 2} (FM)</span>
+        </div>
+        <div class="kb-guide-grid">
+          <div class="kb-guide-item"><b>${guide.timingIcon} Activation:</b> ${guide.timingCost}</div>
+          <div class="kb-guide-item"><b>🎯 Targeting:</b> ${guide.targeting}</div>
+          <div class="kb-guide-item"><b>💡 Health Burn:</b> May sacrifice 1 Health for +1 to roll</div>
+          <div class="kb-guide-item"><b>🩸 Strain:</b> ${p.strain ? p.strain + ' Strain damage on use' : 'Strain 0 (No self-recoil)'}</div>
+        </div>
+      </div>
+
       <div class="kb-meta-footer">
         <div>
           <span style="font-weight:700">Core to:</span>
           <span class="kb-bg-tags">
-            ${coreBgs.length ? coreBgs.map(bg => `<span class="kb-bg-tag" data-bg="${bg}">${bg}</span>`).join("") : '<em>None (Universal)</em>'}
+            ${coreBgs.length ? coreBgs.map(bg => `<span class="kb-bg-tag" data-bg="${bg}" title="Filter powers by ${bg}">${bg}</span>`).join("") : '<em>None (Universal)</em>'}
           </span>
         </div>
+        <div class="kb-nav-hint">🧭 Click tag to filter · Click title for popup · Use buttons below to assign</div>
       </div>
 
       <div class="kb-card-actions no-print">
@@ -2450,6 +2711,9 @@ function renderPowersKB(){
         </button>
       </div>
     `;
+
+    // Click title to show modal
+    card.querySelector('h4').onclick = () => showPowerModal(name, false);
     grid.appendChild(card);
   });
 
@@ -2820,7 +3084,7 @@ function renderRefCodex(){
             ${b.powers.map(p => {
               const pData = POWERS_DATA[p] || { tn: 10 };
               const timing = getPowerTiming(pData);
-              return `<span class="pwopt" data-pname="${p}" style="font-size:11px;padding:3px 8px"><span>${p}</span> <span class="timing-chip timing-${timing.key}" title="${timing.label} Power">${timing.icon} ${timing.label}</span> <span class="tn">TN ${pData.tn}</span></span>`;
+              return `<span class="pwopt" data-pname="${p}" style="font-size:11px;padding:3px 8px" title="${p} (${timing.label}, TN ${pData.tn}) — Click to view activation rules, dice roll, strain, and crew navigation"><span>${p}</span> <span class="timing-chip timing-${timing.key}" title="${timing.label} Power">${timing.icon} ${timing.label}</span> <span class="tn">TN ${pData.tn}</span></span>`;
             }).join("")}
           </div>
         </div>
